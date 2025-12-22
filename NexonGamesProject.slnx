@@ -1,4 +1,5 @@
 ﻿<Solution>
+  <Project Path="NexonGame.Tests.PlayMode.csproj" />
   <Project Path="NexonGame.Tests.EditMode.csproj" />
   <Project Path="NexonGame.Editor.csproj" />
   <Project Path="NexonGame.Runtime.csproj" />
