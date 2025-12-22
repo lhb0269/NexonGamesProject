@@ -48,17 +48,7 @@ namespace NexonGame.BlueArchive.Stage
             _gridPosition = gridPosition;
             _platformType = type;
 
-            // 태그 설정 (태그가 없으면 무시)
-            try
-            {
-                gameObject.tag = "Platform";
-            }
-            catch (UnityException)
-            {
-                // Platform 태그가 없으면 무시
-                Debug.LogWarning("[PlatformObject] 'Platform' 태그가 정의되지 않았습니다. Edit → Project Settings → Tags에서 추가하세요.");
-            }
-
+            // 이름 설정 (태그는 사용하지 않음)
             gameObject.name = $"Platform_{type}_{gridPosition.x}_{gridPosition.y}";
 
             UpdateVisual();
