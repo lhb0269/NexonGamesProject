@@ -46,25 +46,25 @@ namespace NexonGame.BlueArchive.Data
                 {
                     enemyName = "일반병 A",
                     spawnPosition = new Vector2Int(8, 2),
-                    enemyHP = 800,
-                    enemyAttack = 45,
-                    enemyDefense = 15
+                    hp = 800,
+                    attack = 45,
+                    defense = 15
                 },
                 new EnemySpawnData
                 {
                     enemyName = "일반병 B",
                     spawnPosition = new Vector2Int(9, 1),
-                    enemyHP = 800,
-                    enemyAttack = 45,
-                    enemyDefense = 15
+                    hp = 800,
+                    attack = 45,
+                    defense = 15
                 },
                 new EnemySpawnData
                 {
                     enemyName = "정예병",
                     spawnPosition = new Vector2Int(9, 3),
-                    enemyHP = 1200,
-                    enemyAttack = 60,
-                    enemyDefense = 20
+                    hp = 1200,
+                    attack = 60,
+                    defense = 20
                 }
             };
 
