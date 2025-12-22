@@ -1,0 +1,280 @@
+using System.Collections;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
+using UnityEngine.SceneManagement;
+using NexonGame.BlueArchive.Stage;
+using NexonGame.BlueArchive.Data;
+
+namespace NexonGame.Tests.PlayMode
+{
+    /// <summary>
+    /// 스테이지 시스템 PlayMode 테스트
+    /// - GameObject 생성 및 비주얼 검증
+    /// - 플랫폼 이동 테스트
+    /// </summary>
+    public class StagePlayModeTests
+    {
+        private GameObject _testSceneRoot;
+        private StageManager _stageManager;
+        private StageData _testStageData;
+
+        [UnitySetUp]
+        public IEnumerator SetUp()
+        {
+            // 테스트용 씬 루트 생성
+            _testSceneRoot = new GameObject("TestSceneRoot");
+
+            // StageManager 생성
+            var managerObj = new GameObject("StageManager");
+            managerObj.transform.SetParent(_testSceneRoot.transform);
+            _stageManager = managerObj.AddComponent<StageManager>();
+
+            // GridVisualizer 추가
+            var visualizerObj = new GameObject("GridVisualizer");
+            visualizerObj.transform.SetParent(managerObj.transform);
+            visualizerObj.AddComponent<GridVisualizer>();
+
+            // 테스트 데이터 생성
+            _testStageData = StagePresets.CreateNormal1_4();
+
+            yield return null;
+        }
+
+        [UnityTearDown]
+        public IEnumerator TearDown()
+        {
+            // 테스트 데이터 정리
+            if (_testStageData != null)
+            {
+                StagePresets.DestroyStageData(_testStageData);
+            }
+
+            // 테스트 오브젝트 제거
+            if (_testSceneRoot != null)
+            {
+                Object.Destroy(_testSceneRoot);
+            }
+
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_InitializeStage_ShouldCreatePlatforms()
+        {
+            // Act
+            _stageManager.InitializeStage(_testStageData);
+            yield return null; // 1 프레임 대기
+
+            // Assert
+            var platforms = GameObject.FindGameObjectsWithTag("Platform");
+
+            // 시작 위치 1개 + 일반 플랫폼 6개 + 전투 위치 1개 = 8개
+            int expectedPlatformCount = 1 + _testStageData.platformPositions.Count + 1;
+            Assert.AreEqual(expectedPlatformCount, platforms.Length, $"플랫폼 개수가 {expectedPlatformCount}개여야 함");
+
+            // 플랫폼 오브젝트 검증
+            foreach (var platformObj in platforms)
+            {
+                var platform = platformObj.GetComponent<PlatformObject>();
+                Assert.IsNotNull(platform, "PlatformObject 컴포넌트가 있어야 함");
+            }
+
+            Debug.Log($"✅ [PlayMode Test] {platforms.Length}개의 플랫폼이 생성됨");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_InitializeStage_ShouldSetCorrectState()
+        {
+            // Act
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            // Assert
+            Assert.AreEqual(StageState.MovingToBattle, _stageManager.CurrentState, "초기 상태는 MovingToBattle");
+            Assert.AreEqual(_testStageData.startPosition, _stageManager.PlayerPosition, "시작 위치 확인");
+
+            Debug.Log($"✅ [PlayMode Test] 스테이지 상태: {_stageManager.CurrentState}");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_MovePlayer_ShouldUpdatePosition()
+        {
+            // Arrange
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            Vector2Int startPos = _stageManager.PlayerPosition;
+            Vector2Int targetPos = _testStageData.platformPositions[0]; // 첫 번째 플랫폼
+
+            // Act
+            bool moved = _stageManager.MovePlayer(targetPos);
+            yield return new WaitForSeconds(0.1f); // 비주얼 업데이트 대기
+
+            // Assert
+            Assert.IsTrue(moved, "이동 성공해야 함");
+            Assert.AreEqual(targetPos, _stageManager.PlayerPosition, "플레이어 위치 업데이트 확인");
+            Assert.AreNotEqual(startPos, _stageManager.PlayerPosition, "위치가 변경되어야 함");
+
+            Debug.Log($"✅ [PlayMode Test] 플레이어 이동: {startPos} → {targetPos}");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_GetPathToBattle_ShouldReturnValidPath()
+        {
+            // Arrange
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            // Act
+            var path = _stageManager.GetPathToBattle();
+
+            // Assert
+            Assert.IsNotNull(path, "경로가 null이 아니어야 함");
+            Assert.IsNotEmpty(path, "경로가 비어있지 않아야 함");
+            Assert.AreEqual(_testStageData.battlePosition, path[path.Count - 1], "경로의 마지막은 전투 위치");
+
+            Debug.Log($"✅ [PlayMode Test] 전투까지 경로: {path.Count}칸");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_MovePlayerToBattle_ShouldReachBattlePosition()
+        {
+            // Arrange
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            var path = _stageManager.GetPathToBattle();
+
+            // Act - 경로를 따라 이동
+            foreach (var pos in path)
+            {
+                bool moved = _stageManager.MovePlayer(pos);
+                Assert.IsTrue(moved, $"위치 {pos}로 이동 실패");
+                yield return new WaitForSeconds(0.05f); // 짧은 대기
+            }
+
+            // Assert
+            Assert.AreEqual(_testStageData.battlePosition, _stageManager.PlayerPosition, "전투 위치 도착 확인");
+            Assert.AreEqual(StageState.ReadyForBattle, _stageManager.CurrentState, "전투 준비 상태 확인");
+            Assert.IsTrue(_stageManager.CanEnterBattle(), "전투 진입 가능해야 함");
+
+            Debug.Log($"✅ [PlayMode Test] 전투 위치 도착! 총 {_stageManager.TotalMovesInStage}회 이동");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_StartBattle_ShouldChangeState()
+        {
+            // Arrange
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            // 전투 위치까지 이동
+            var path = _stageManager.GetPathToBattle();
+            foreach (var pos in path)
+            {
+                _stageManager.MovePlayer(pos);
+                yield return null;
+            }
+
+            // Act
+            _stageManager.StartBattle();
+            yield return null;
+
+            // Assert
+            Assert.AreEqual(StageState.InBattle, _stageManager.CurrentState, "전투 중 상태 확인");
+
+            Debug.Log("✅ [PlayMode Test] 전투 시작!");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_CompleteBattle_Victory_ShouldUpdateState()
+        {
+            // Arrange
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            var path = _stageManager.GetPathToBattle();
+            foreach (var pos in path)
+            {
+                _stageManager.MovePlayer(pos);
+                yield return null;
+            }
+
+            _stageManager.StartBattle();
+            yield return null;
+
+            // Act
+            _stageManager.CompleteBattle(victory: true);
+            yield return null;
+
+            // Assert
+            Assert.AreEqual(StageState.BattleCompleted, _stageManager.CurrentState, "전투 완료 상태");
+
+            Debug.Log("✅ [PlayMode Test] 전투 승리!");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_ClearStage_ShouldCompleteStage()
+        {
+            // Arrange
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            var path = _stageManager.GetPathToBattle();
+            foreach (var pos in path)
+            {
+                _stageManager.MovePlayer(pos);
+                yield return null;
+            }
+
+            _stageManager.StartBattle();
+            yield return null;
+
+            _stageManager.CompleteBattle(victory: true);
+            yield return null;
+
+            // Act
+            _stageManager.ClearStage();
+            yield return null;
+
+            // Assert
+            Assert.AreEqual(StageState.StageCleared, _stageManager.CurrentState, "스테이지 클리어 상태");
+
+            Debug.Log("✅ [PlayMode Test] 스테이지 클리어!");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_PlayerMarker_ShouldExist()
+        {
+            // Arrange
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            // Act
+            var playerMarker = GameObject.Find("PlayerMarker");
+
+            // Assert
+            Assert.IsNotNull(playerMarker, "플레이어 마커가 존재해야 함");
+
+            Debug.Log("✅ [PlayMode Test] 플레이어 마커 존재 확인");
+        }
+
+        [UnityTest]
+        public IEnumerator StageManager_GridVisualizer_ShouldCreateGridLines()
+        {
+            // Arrange
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            // Act
+            var gridLines = GameObject.FindGameObjectsWithTag("GridLine");
+            var visualizer = _stageManager.GetComponentInChildren<GridVisualizer>();
+
+            // Assert - GridVisualizer 존재 확인
+            Assert.IsNotNull(visualizer, "GridVisualizer가 있어야 함");
+
+            Debug.Log("✅ [PlayMode Test] GridVisualizer 존재 확인");
+        }
+    }
+}
