@@ -29,7 +29,7 @@ namespace NexonGame.BlueArchive.Stage
 
         // 프로퍼티
         public StageController StageController => _stageController;
-        public StageState CurrentState => _stageController?.CurrentState ?? StageState.NotInitialized;
+        public StageState CurrentState => _stageController?.CurrentState ?? StageState.NotStarted;
         public Vector2Int PlayerPosition => _stageController?.PlayerPosition ?? Vector2Int.zero;
         public int TotalMovesInStage => _stageController?.TotalMovesInStage ?? 0;
 
@@ -249,7 +249,7 @@ namespace NexonGame.BlueArchive.Stage
         /// </summary>
         public bool CanEnterBattle()
         {
-            return _stageController.CanEnterBattle();
+            return _stageController != null && _stageController.CurrentState == StageState.ReadyForBattle;
         }
 
         /// <summary>

@@ -209,7 +209,7 @@ namespace NexonGame.Tests.PlayMode
             yield return null;
 
             // Assert
-            Assert.AreEqual(StageState.BattleCompleted, _stageManager.CurrentState, "전투 완료 상태");
+            Assert.AreEqual(StageState.BattleComplete, _stageManager.CurrentState, "전투 완료 상태");
 
             Debug.Log("✅ [PlayMode Test] 전투 승리!");
         }
