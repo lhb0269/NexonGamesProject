@@ -66,21 +66,20 @@ namespace NexonGame.Tests.PlayMode
             _stageManager.InitializeStage(_testStageData);
             yield return null; // 1 프레임 대기
 
-            // Assert
-            var platforms = GameObject.FindGameObjectsWithTag("Platform");
+            // Assert - 이름으로 플랫폼 찾기
+            var allObjects = Object.FindObjectsByType<PlatformObject>(FindObjectsSortMode.None);
 
             // 시작 위치 1개 + 일반 플랫폼 6개 + 전투 위치 1개 = 8개
             int expectedPlatformCount = 1 + _testStageData.platformPositions.Count + 1;
-            Assert.AreEqual(expectedPlatformCount, platforms.Length, $"플랫폼 개수가 {expectedPlatformCount}개여야 함");
+            Assert.AreEqual(expectedPlatformCount, allObjects.Length, $"플랫폼 개수가 {expectedPlatformCount}개여야 함");
 
             // 플랫폼 오브젝트 검증
-            foreach (var platformObj in platforms)
+            foreach (var platform in allObjects)
             {
-                var platform = platformObj.GetComponent<PlatformObject>();
                 Assert.IsNotNull(platform, "PlatformObject 컴포넌트가 있어야 함");
             }
 
-            Debug.Log($"✅ [PlayMode Test] {platforms.Length}개의 플랫폼이 생성됨");
+            Debug.Log($"✅ [PlayMode Test] {allObjects.Length}개의 플랫폼이 생성됨");
         }
 
         [UnityTest]
@@ -268,7 +267,6 @@ namespace NexonGame.Tests.PlayMode
             yield return null;
 
             // Act
-            var gridLines = GameObject.FindGameObjectsWithTag("GridLine");
             var visualizer = _stageManager.GetComponentInChildren<GridVisualizer>();
 
             // Assert - GridVisualizer 존재 확인
