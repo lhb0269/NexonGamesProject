@@ -16,7 +16,7 @@ namespace NexonGame.Managers
         public void Initialize()
         {
             var go = new GameObject("SceneLoader");
-            Object.DontDestroyOnLoad(go);
+            UnityEngine.Object.DontDestroyOnLoad(go);
             _coroutineRunner = go.AddComponent<CoroutineRunner>();
 
             Debug.Log("SceneLoader 초기화 완료");
@@ -26,7 +26,7 @@ namespace NexonGame.Managers
         {
             if (_coroutineRunner != null)
             {
-                Object.Destroy(_coroutineRunner.gameObject);
+                UnityEngine.Object.Destroy(_coroutineRunner.gameObject);
             }
         }
 
