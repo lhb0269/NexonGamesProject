@@ -65,6 +65,22 @@ namespace NexonGame.BlueArchive.Character
         }
 
         /// <summary>
+        /// 스킬 사용에 필요한 코스트를 반환합니다
+        /// </summary>
+        public int GetSkillCost()
+        {
+            return Data.exSkill != null ? Data.exSkill.costAmount : 0;
+        }
+
+        /// <summary>
+        /// 스킬 사용이 가능한지 확인합니다 (쿨다운 체크)
+        /// </summary>
+        public bool CanUseSkill()
+        {
+            return IsSkillReady && Data.exSkill != null;
+        }
+
+        /// <summary>
         /// 스킬 쿨다운을 업데이트합니다
         /// </summary>
         public void UpdateCooldown(float deltaTime)

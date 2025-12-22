@@ -190,5 +190,39 @@ namespace NexonGame.Tests.EditMode
             // Assert
             Assert.AreEqual(1000, student.CurrentHP);  // Should cap at maxHP
         }
+
+        [Test]
+        public void Student_GetSkillCost_ShouldReturnCorrectCost()
+        {
+            // Arrange
+            var student = new Student(_testStudentData);
+
+            // Act
+            int cost = student.GetSkillCost();
+
+            // Assert
+            Assert.AreEqual(3, cost);  // _testSkillData.costAmount = 3
+        }
+
+        [Test]
+        public void Student_CanUseSkill_ShouldReturnTrueWhenReady()
+        {
+            // Arrange
+            var student = new Student(_testStudentData);
+
+            // Assert
+            Assert.IsTrue(student.CanUseSkill());
+        }
+
+        [Test]
+        public void Student_CanUseSkill_ShouldReturnFalseWhenOnCooldown()
+        {
+            // Arrange
+            var student = new Student(_testStudentData);
+            student.UseSkill();
+
+            // Assert
+            Assert.IsFalse(student.CanUseSkill());
+        }
     }
 }

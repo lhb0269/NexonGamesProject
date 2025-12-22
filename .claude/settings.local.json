@@ -6,7 +6,8 @@
       "Bash(git init:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nfeat: 블루 아카이브 테스트 자동화 프로젝트 초기 설정\n\n- DI 패턴 기반 프로젝트 구조 구축\n- ServiceLocator 및 GameBootstrapper 구현\n- 핵심 매니저 시스템 (Audio, Scene, Input, UI)\n- Assembly Definition 파일 설정\n- 에디터 도구 (ProjectSetupWindow, AssetValidator)\n- 프로젝트 문서화 (CLAUDE.md, README, CONTRIBUTING, CHANGELOG)\n- 블루 아카이브 Normal 1-4 스테이지 테스트 자동화 계획 수립\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
