@@ -18,12 +18,16 @@ namespace NexonGame.Tests.PlayMode
         private GameObject _testSceneRoot;
         private StageManager _stageManager;
         private StageData _testStageData;
+        private Camera _testCamera;
 
         [UnitySetUp]
         public IEnumerator SetUp()
         {
             // 테스트용 씬 루트 생성
             _testSceneRoot = new GameObject("TestSceneRoot");
+
+            // 테스트용 카메라 생성 (시각화용)
+            CreateTestCamera();
 
             // StageManager 생성
             var managerObj = new GameObject("StageManager");
@@ -39,6 +43,31 @@ namespace NexonGame.Tests.PlayMode
             _testStageData = StagePresets.CreateNormal1_4();
 
             yield return null;
+        }
+
+        /// <summary>
+        /// 테스트용 카메라 생성
+        /// </summary>
+        private void CreateTestCamera()
+        {
+            var cameraObj = new GameObject("TestCamera");
+            cameraObj.transform.SetParent(_testSceneRoot.transform);
+
+            _testCamera = cameraObj.AddComponent<Camera>();
+            _testCamera.transform.position = new Vector3(0, 10, -5);
+            _testCamera.transform.rotation = Quaternion.Euler(45, 0, 0);
+            _testCamera.orthographic = true;
+            _testCamera.orthographicSize = 8;
+            _testCamera.clearFlags = CameraClearFlags.SolidColor;
+            _testCamera.backgroundColor = new Color(0.1f, 0.1f, 0.15f);
+
+            // 조명 추가
+            var lightObj = new GameObject("TestLight");
+            lightObj.transform.SetParent(_testSceneRoot.transform);
+            var light = lightObj.AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.transform.rotation = Quaternion.Euler(50, -30, 0);
+            light.intensity = 1f;
         }
 
         [UnityTearDown]
@@ -62,25 +91,27 @@ namespace NexonGame.Tests.PlayMode
         [UnityTest]
         public IEnumerator StageManager_InitializeStage_ShouldCreatePlatforms()
         {
+            Debug.Log("=== 테스트 시작: 플랫폼 생성 검증 ===");
+
             // Act
             _stageManager.InitializeStage(_testStageData);
-            yield return null; // 1 프레임 대기
+            yield return new WaitForSeconds(0.5f); // 시각화 대기
 
-            // Assert
-            var platforms = GameObject.FindGameObjectsWithTag("Platform");
+            // Assert - 이름으로 플랫폼 찾기
+            var allObjects = Object.FindObjectsByType<PlatformObject>(FindObjectsSortMode.None);
 
             // 시작 위치 1개 + 일반 플랫폼 6개 + 전투 위치 1개 = 8개
             int expectedPlatformCount = 1 + _testStageData.platformPositions.Count + 1;
-            Assert.AreEqual(expectedPlatformCount, platforms.Length, $"플랫폼 개수가 {expectedPlatformCount}개여야 함");
+            Assert.AreEqual(expectedPlatformCount, allObjects.Length, $"플랫폼 개수가 {expectedPlatformCount}개여야 함");
 
             // 플랫폼 오브젝트 검증
-            foreach (var platformObj in platforms)
+            foreach (var platform in allObjects)
             {
-                var platform = platformObj.GetComponent<PlatformObject>();
                 Assert.IsNotNull(platform, "PlatformObject 컴포넌트가 있어야 함");
             }
 
-            Debug.Log($"✅ [PlayMode Test] {platforms.Length}개의 플랫폼이 생성됨");
+            Debug.Log($"✅ [PlayMode Test] {allObjects.Length}개의 플랫폼이 생성됨");
+            yield return new WaitForSeconds(0.5f); // 결과 확인 대기
         }
 
         [UnityTest]
@@ -140,18 +171,22 @@ namespace NexonGame.Tests.PlayMode
         [UnityTest]
         public IEnumerator StageManager_MovePlayerToBattle_ShouldReachBattlePosition()
         {
+            Debug.Log("=== 테스트 시작: 전투 위치까지 이동 ===");
+
             // Arrange
             _stageManager.InitializeStage(_testStageData);
-            yield return null;
+            yield return new WaitForSeconds(1f); // 초기화 확인
 
             var path = _stageManager.GetPathToBattle();
+            Debug.Log($"경로: {path.Count}칸, 목표: {_testStageData.battlePosition}");
 
-            // Act - 경로를 따라 이동
+            // Act - 경로를 따라 이동 (천천히)
             foreach (var pos in path)
             {
+                Debug.Log($"이동 중: {_stageManager.PlayerPosition} → {pos}");
                 bool moved = _stageManager.MovePlayer(pos);
                 Assert.IsTrue(moved, $"위치 {pos}로 이동 실패");
-                yield return new WaitForSeconds(0.05f); // 짧은 대기
+                yield return new WaitForSeconds(0.3f); // 이동 애니메이션 관찰
             }
 
             // Assert
@@ -160,6 +195,7 @@ namespace NexonGame.Tests.PlayMode
             Assert.IsTrue(_stageManager.CanEnterBattle(), "전투 진입 가능해야 함");
 
             Debug.Log($"✅ [PlayMode Test] 전투 위치 도착! 총 {_stageManager.TotalMovesInStage}회 이동");
+            yield return new WaitForSeconds(1f); // 결과 확인
         }
 
         [UnityTest]
@@ -268,7 +304,6 @@ namespace NexonGame.Tests.PlayMode
             yield return null;
 
             // Act
-            var gridLines = GameObject.FindGameObjectsWithTag("GridLine");
             var visualizer = _stageManager.GetComponentInChildren<GridVisualizer>();
 
             // Assert - GridVisualizer 존재 확인

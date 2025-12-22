@@ -48,7 +48,7 @@ namespace NexonGame.BlueArchive.Stage
             _gridPosition = gridPosition;
             _platformType = type;
 
-            gameObject.tag = "Platform"; // 태그 설정
+            // 이름 설정 (태그는 사용하지 않음)
             gameObject.name = $"Platform_{type}_{gridPosition.x}_{gridPosition.y}";
 
             UpdateVisual();
