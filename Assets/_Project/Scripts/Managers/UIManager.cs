@@ -17,7 +17,7 @@ namespace NexonGame.Managers
         public void Initialize()
         {
             var go = new GameObject("UIManager");
-            Object.DontDestroyOnLoad(go);
+            UnityEngine.Object.DontDestroyOnLoad(go);
             _coroutineRunner = go.AddComponent<UICoroutineRunner>();
 
             Debug.Log("UIManager 초기화 완료");
@@ -29,7 +29,7 @@ namespace NexonGame.Managers
 
             if (_coroutineRunner != null)
             {
-                Object.Destroy(_coroutineRunner.gameObject);
+                UnityEngine.Object.Destroy(_coroutineRunner.gameObject);
             }
         }
 

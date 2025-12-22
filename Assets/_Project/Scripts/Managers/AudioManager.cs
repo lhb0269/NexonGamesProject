@@ -16,7 +16,7 @@ namespace NexonGame.Managers
         public void Initialize()
         {
             _audioRoot = new GameObject("AudioManager");
-            Object.DontDestroyOnLoad(_audioRoot);
+            UnityEngine.Object.DontDestroyOnLoad(_audioRoot);
 
             _musicSource = _audioRoot.AddComponent<AudioSource>();
             _musicSource.playOnAwake = false;
@@ -29,7 +29,7 @@ namespace NexonGame.Managers
         {
             if (_audioRoot != null)
             {
-                Object.Destroy(_audioRoot);
+                UnityEngine.Object.Destroy(_audioRoot);
             }
         }
 
@@ -61,7 +61,7 @@ namespace NexonGame.Managers
             audioSource.volume = volume * _sfxVolume;
             audioSource.Play();
 
-            Object.Destroy(sfxObject, clip.length + 0.1f);
+            UnityEngine.Object.Destroy(sfxObject, clip.length + 0.1f);
         }
 
         public void PlaySFXAtPosition(AudioClip clip, Vector3 position, float volume = 1f)
@@ -76,7 +76,7 @@ namespace NexonGame.Managers
             audioSource.spatialBlend = 1f; // 3D 사운드
             audioSource.Play();
 
-            Object.Destroy(sfxObject, clip.length + 0.1f);
+            UnityEngine.Object.Destroy(sfxObject, clip.length + 0.1f);
         }
 
         public void SetMusicVolume(float volume)
