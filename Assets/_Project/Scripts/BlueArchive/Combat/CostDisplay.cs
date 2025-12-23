@@ -82,12 +82,17 @@ namespace NexonGame.BlueArchive.Combat
             _fillImage.color = _fullColor;
             _fillImage.type = Image.Type.Filled;
             _fillImage.fillMethod = Image.FillMethod.Horizontal;
-            _fillImage.fillAmount = 1f;
+            _fillImage.fillOrigin = 0; // 왼쪽에서 시작
+            _fillImage.fillAmount = 0f; // 초기값 0
 
             // Fill Bar의 Anchor 설정 (왼쪽 정렬)
             _fillBar.anchorMin = new Vector2(0f, 0.5f);
             _fillBar.anchorMax = new Vector2(0f, 0.5f);
             _fillBar.pivot = new Vector2(0f, 0.5f);
+
+            // 초기 상태
+            _currentFillAmount = 0f;
+            _targetFillAmount = 0f;
 
             // 텍스트 라벨
             var textObj = new GameObject("CostText");
@@ -159,7 +164,7 @@ namespace NexonGame.BlueArchive.Combat
             // 색상 업데이트
             UpdateColor();
 
-            // 즉시 변화 (코스트 소모 시)
+            // 코스트 소모 시 즉시 반영 (Update()의 애니메이션을 건너뜀)
             if (currentCost < prevCost)
             {
                 _currentFillAmount = _targetFillAmount;
@@ -198,21 +203,25 @@ namespace NexonGame.BlueArchive.Combat
         {
             if (_fillImage == null) return;
 
-            // 회복 중일 때만 부드럽게 애니메이션
-            if (_isRegenerating && Mathf.Abs(_currentFillAmount - _targetFillAmount) > 0.01f)
+            // 목표값과 차이가 있으면 업데이트
+            if (Mathf.Abs(_currentFillAmount - _targetFillAmount) > 0.001f)
             {
-                _currentFillAmount = Mathf.SmoothDamp(
-                    _currentFillAmount,
-                    _targetFillAmount,
-                    ref _fillVelocity,
-                    _smoothTime
-                );
+                if (_isRegenerating)
+                {
+                    // 회복 중일 때는 부드럽게 애니메이션
+                    _currentFillAmount = Mathf.SmoothDamp(
+                        _currentFillAmount,
+                        _targetFillAmount,
+                        ref _fillVelocity,
+                        _smoothTime
+                    );
+                }
+                else
+                {
+                    // 회복 중이 아니면 즉시 반영
+                    _currentFillAmount = _targetFillAmount;
+                }
 
-                _fillImage.fillAmount = _currentFillAmount;
-            }
-            else if (!_isRegenerating)
-            {
-                _currentFillAmount = _targetFillAmount;
                 _fillImage.fillAmount = _currentFillAmount;
             }
         }
