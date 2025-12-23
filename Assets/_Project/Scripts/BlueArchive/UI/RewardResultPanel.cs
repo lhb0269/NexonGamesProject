@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using NexonGame.BlueArchive.Reward;
+using NexonGame.BlueArchive.Data;
 
 namespace NexonGame.BlueArchive.UI
 {
