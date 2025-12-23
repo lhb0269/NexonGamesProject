@@ -16,9 +16,9 @@ namespace NexonGame.BlueArchive.Data
         public static StudentData CreateShiroko()
         {
             var skillData = ScriptableObject.CreateInstance<SkillData>();
-            skillData.skillName = "섬멸의 주사위";
-            skillData.costAmount = 3;
-            skillData.baseDamage = 650;
+            skillData.skillName = "드론 소환: 화력 지원";
+            skillData.costAmount = 2;
+            skillData.baseDamage = 400;
             skillData.damageMultiplier = 1.8f;
             skillData.targetType = SkillTargetType.Single;
             skillData.cooldownTime = 20f;
@@ -26,9 +26,9 @@ namespace NexonGame.BlueArchive.Data
             var studentData = ScriptableObject.CreateInstance<StudentData>();
             studentData.studentName = "Shiroko";
             studentData.studentId = 1;
-            studentData.maxHP = 2431;
-            studentData.attack = 478;
-            studentData.defense = 16;
+            studentData.maxHP = 2492;
+            studentData.attack = 340;
+            studentData.defense = 19;
             studentData.exSkill = skillData;
             studentData.teamColor = new Color(0.2f, 0.5f, 0.8f); // 블루
 
@@ -41,9 +41,9 @@ namespace NexonGame.BlueArchive.Data
         public static StudentData CreateHoshino()
         {
             var skillData = ScriptableObject.CreateInstance<SkillData>();
-            skillData.skillName = "낙천적 방패";
+            skillData.skillName = "전술 진압";
             skillData.costAmount = 4;
-            skillData.baseDamage = 450;
+            skillData.baseDamage = 435;
             skillData.damageMultiplier = 1.5f;
             skillData.targetType = SkillTargetType.Single;
             skillData.cooldownTime = 25f;
@@ -51,9 +51,9 @@ namespace NexonGame.BlueArchive.Data
             var studentData = ScriptableObject.CreateInstance<StudentData>();
             studentData.studentName = "Hoshino";
             studentData.studentId = 2;
-            studentData.maxHP = 3528;
-            studentData.attack = 382;
-            studentData.defense = 28;
+            studentData.maxHP = 3275;
+            studentData.attack = 213;
+            studentData.defense = 175;
             studentData.exSkill = skillData;
             studentData.teamColor = new Color(0.8f, 0.3f, 0.5f); // 핑크
 
@@ -66,9 +66,9 @@ namespace NexonGame.BlueArchive.Data
         public static StudentData CreateAru()
         {
             var skillData = ScriptableObject.CreateInstance<SkillData>();
-            skillData.skillName = "더 퍼펙트 범죄";
-            skillData.costAmount = 3;
-            skillData.baseDamage = 580;
+            skillData.skillName = "하드보일드 샷";
+            skillData.costAmount = 4;
+            skillData.baseDamage = 274;
             skillData.damageMultiplier = 2.0f;
             skillData.targetType = SkillTargetType.Multiple;
             skillData.cooldownTime = 22f;
@@ -76,9 +76,9 @@ namespace NexonGame.BlueArchive.Data
             var studentData = ScriptableObject.CreateInstance<StudentData>();
             studentData.studentName = "Aru";
             studentData.studentId = 3;
-            studentData.maxHP = 2156;
-            studentData.attack = 524;
-            studentData.defense = 14;
+            studentData.maxHP = 2505;
+            studentData.attack = 451;
+            studentData.defense = 19;
             studentData.exSkill = skillData;
             studentData.teamColor = new Color(0.9f, 0.2f, 0.2f); // 레드
 
@@ -91,9 +91,9 @@ namespace NexonGame.BlueArchive.Data
         public static StudentData CreateHaruna()
         {
             var skillData = ScriptableObject.CreateInstance<SkillData>();
-            skillData.skillName = "라스트 불릿";
-            skillData.costAmount = 5;
-            skillData.baseDamage = 850;
+            skillData.skillName = "꿰뚫는 엘레강스";
+            skillData.costAmount = 4;
+            skillData.baseDamage = 506;
             skillData.damageMultiplier = 2.5f;
             skillData.targetType = SkillTargetType.Single;
             skillData.cooldownTime = 30f;
@@ -101,9 +101,9 @@ namespace NexonGame.BlueArchive.Data
             var studentData = ScriptableObject.CreateInstance<StudentData>();
             studentData.studentName = "Haruna";
             studentData.studentId = 4;
-            studentData.maxHP = 1989;
-            studentData.attack = 612;
-            studentData.defense = 12;
+            studentData.maxHP = 2451;
+            studentData.attack = 457;
+            studentData.defense = 19;
             studentData.exSkill = skillData;
             studentData.teamColor = new Color(0.4f, 0.2f, 0.7f); // 퍼플
 

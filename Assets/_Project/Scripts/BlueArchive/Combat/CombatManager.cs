@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NexonGame.BlueArchive.Character;
 using NexonGame.BlueArchive.Data;
 using NexonGame.BlueArchive.Skill;
+using NexonGame.BlueArchive.UI;
 
 namespace NexonGame.BlueArchive.Combat
 {
@@ -42,6 +43,8 @@ namespace NexonGame.BlueArchive.Combat
 
         // UI 컴포넌트
         private CostDisplay _costDisplay;
+        private CombatLogPanel _combatLogPanel;
+        private CombatStatusPanel _combatStatusPanel;
 
         // 프로퍼티
         public CombatSystem CombatSystem => _combatSystem;
@@ -106,6 +109,12 @@ namespace NexonGame.BlueArchive.Combat
 
             // UI 생성
             CreateCostDisplay();
+            CreateCombatLogPanel();
+            CreateCombatStatusPanel(students);
+
+            // 초기 로그
+            _combatLogPanel?.AddLog($"전투 시작: {stageName}", CombatLogPanel.LogType.System);
+            _combatLogPanel?.AddLog($"{students.Count}명 학생 vs {enemies.Count}명 적", CombatLogPanel.LogType.System);
 
             Debug.Log($"[CombatManager] 전투 초기화 완료: {students.Count}명 학생 vs {enemies.Count}명 적");
         }
@@ -250,6 +259,37 @@ namespace NexonGame.BlueArchive.Combat
         }
 
         /// <summary>
+        /// 전투 로그 패널 생성
+        /// </summary>
+        private void CreateCombatLogPanel()
+        {
+            if (_combatLogPanel != null)
+            {
+                Destroy(_combatLogPanel.gameObject);
+            }
+
+            var logPanelObj = new GameObject("CombatLogPanel");
+            logPanelObj.transform.SetParent(transform);
+            _combatLogPanel = logPanelObj.AddComponent<CombatLogPanel>();
+        }
+
+        /// <summary>
+        /// 전투 상태 패널 생성
+        /// </summary>
+        private void CreateCombatStatusPanel(List<Student> students)
+        {
+            if (_combatStatusPanel != null)
+            {
+                Destroy(_combatStatusPanel.gameObject);
+            }
+
+            var statusPanelObj = new GameObject("CombatStatusPanel");
+            statusPanelObj.transform.SetParent(transform);
+            _combatStatusPanel = statusPanelObj.AddComponent<CombatStatusPanel>();
+            _combatStatusPanel.InitializeStudents(students);
+        }
+
+        /// <summary>
         /// 학생 스킬 사용
         /// </summary>
         public SkillExecutionResult UseStudentSkill(int studentIndex)
@@ -268,6 +308,15 @@ namespace NexonGame.BlueArchive.Combat
 
             if (result != null && result.Success)
             {
+                // 스킬 사용 로그
+                _combatLogPanel?.AddLog($"{student.Data.studentName} EX 스킬 사용!", CombatLogPanel.LogType.Skill);
+
+                // 데미지 로그
+                if (result.TotalDamage > 0)
+                {
+                    _combatLogPanel?.AddLog($"{result.TotalDamage} 데미지 ({result.TargetsHit}명 타격)", CombatLogPanel.LogType.Damage);
+                }
+
                 // 비주얼 업데이트
                 studentObj.PlaySkillAnimation();
                 UpdateAllVisuals();
@@ -296,11 +345,17 @@ namespace NexonGame.BlueArchive.Combat
                 {
                     enemyObj.gameObject.SetActive(false);
                     Debug.Log($"[CombatManager] {enemyObj.Enemy.Data.enemyName} 격파!");
+
+                    // 격파 로그
+                    _combatLogPanel?.AddLog($"{enemyObj.Enemy.Data.enemyName} 격파!", CombatLogPanel.LogType.Defeat);
                 }
             }
 
             // 코스트 UI 업데이트
             UpdateCostDisplay();
+
+            // 학생 상태 패널 업데이트
+            _combatStatusPanel?.UpdateAllStudents();
         }
 
         /// <summary>
@@ -425,6 +480,18 @@ namespace NexonGame.BlueArchive.Combat
             {
                 Destroy(_costDisplay.gameObject);
                 _costDisplay = null;
+            }
+
+            if (_combatLogPanel != null)
+            {
+                Destroy(_combatLogPanel.gameObject);
+                _combatLogPanel = null;
+            }
+
+            if (_combatStatusPanel != null)
+            {
+                Destroy(_combatStatusPanel.gameObject);
+                _combatStatusPanel = null;
             }
 
             _combatSystem = null;
