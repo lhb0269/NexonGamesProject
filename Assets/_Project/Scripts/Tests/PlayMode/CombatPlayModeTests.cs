@@ -7,6 +7,7 @@ using NexonGame.BlueArchive.Combat;
 using NexonGame.BlueArchive.Character;
 using NexonGame.BlueArchive.Data;
 using NexonGame.BlueArchive.UI;
+using NexonGame.BlueArchive.Reward;
 
 namespace NexonGame.Tests.PlayMode
 {
