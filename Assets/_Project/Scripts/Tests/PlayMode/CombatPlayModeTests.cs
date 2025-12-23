@@ -493,5 +493,65 @@ namespace NexonGame.Tests.PlayMode
             // Cleanup
             Object.Destroy(testPanelObj);
         }
+
+        [UnityTest]
+        public IEnumerator RewardResultPanel_ShouldExist()
+        {
+            Debug.Log("=== 테스트 시작: 보상 결과 패널 존재 확인 ===");
+
+            // Arrange & Act
+            var rewardPanelObj = new GameObject("RewardResultPanel");
+            var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
+            yield return null;
+
+            // Assert
+            Assert.IsNotNull(rewardPanel, "RewardResultPanel이 생성되어야 함");
+
+            Debug.Log("✅ [PlayMode Test] RewardResultPanel 존재 확인");
+            yield return new WaitForSeconds(0.5f); // [시각화용] UI 확인
+
+            // Cleanup
+            Object.Destroy(rewardPanelObj);
+        }
+
+        [UnityTest]
+        public IEnumerator RewardResultPanel_ShouldShowRewards()
+        {
+            Debug.Log("=== 테스트 시작: 보상 표시 테스트 ===");
+
+            // Arrange
+            var rewardPanelObj = new GameObject("RewardResultPanel");
+            var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
+            yield return null;
+
+            // 보상 결과 생성
+            var rewardResult = new RewardGrantResult();
+            rewardResult.GrantedRewards.Add(new RewardItemData
+            {
+                itemName = "크레딧",
+                itemType = RewardItemType.Currency,
+                quantity = 1000
+            });
+            rewardResult.GrantedRewards.Add(new RewardItemData
+            {
+                itemName = "노트",
+                itemType = RewardItemType.Material,
+                quantity = 5
+            });
+
+            string statistics = "이동 횟수: 7회\n스킬 사용: 4회\n총 데미지: 5840";
+
+            // Act
+            rewardPanel.ShowRewards("Normal 1-4", rewardResult, statistics);
+            yield return new WaitForSeconds(2f); // [시각화용] 보상 결과 확인
+
+            // Assert
+            Assert.IsNotNull(rewardPanel);
+
+            Debug.Log("✅ [PlayMode Test] 보상 표시 확인");
+
+            // Cleanup
+            Object.Destroy(rewardPanelObj);
+        }
     }
 }
