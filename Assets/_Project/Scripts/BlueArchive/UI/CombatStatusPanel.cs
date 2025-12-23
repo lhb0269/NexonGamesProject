@@ -104,7 +104,7 @@ namespace NexonGame.BlueArchive.UI
 
             var nameRect = nameObj.AddComponent<RectTransform>();
             nameRect.sizeDelta = new Vector2(UI_WIDTH - 20, 20);
-            nameRect.anchoredPosition = new Vector2(0, -15);
+            nameRect.anchoredPosition = new Vector2(0, 15);
 
             entry.NameText = nameObj.AddComponent<Text>();
             entry.NameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -115,7 +115,7 @@ namespace NexonGame.BlueArchive.UI
             entry.NameText.text = $"  {student.Data.studentName}";
 
             // HP 슬라이더
-            entry.HPSlider = CreateSlider(bgPanel.transform, "HPSlider", new Vector2(-10, -35), UI_WIDTH - 140);
+            entry.HPSlider = CreateSlider(bgPanel.transform, "HPSlider", new Vector2(-10, -10), UI_WIDTH - 140);
             entry.HPFillImage = entry.HPSlider.fillRect.GetComponent<Image>();
 
             // HP 텍스트
@@ -124,7 +124,7 @@ namespace NexonGame.BlueArchive.UI
 
             var hpTextRect = hpTextObj.AddComponent<RectTransform>();
             hpTextRect.sizeDelta = new Vector2(60, 20);
-            hpTextRect.anchoredPosition = new Vector2(UI_WIDTH / 2 - 40, -35);
+            hpTextRect.anchoredPosition = new Vector2(UI_WIDTH / 2 - 40, -10);
 
             entry.HPText = hpTextObj.AddComponent<Text>();
             entry.HPText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -138,7 +138,7 @@ namespace NexonGame.BlueArchive.UI
 
             var skillTextRect = skillTextObj.AddComponent<RectTransform>();
             skillTextRect.sizeDelta = new Vector2(UI_WIDTH - 20, 15);
-            skillTextRect.anchoredPosition = new Vector2(0, -50);
+            skillTextRect.anchoredPosition = new Vector2(0, -13);
 
             entry.SkillText = skillTextObj.AddComponent<Text>();
             entry.SkillText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");

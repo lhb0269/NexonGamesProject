@@ -34,8 +34,8 @@ namespace NexonGame.BlueArchive.Combat
 
         // Canvas 관련
         private Canvas _canvas;
-        private const float UI_WIDTH = 300f;
-        private const float UI_HEIGHT = 40f;
+        private const float UI_WIDTH = 600f;
+        private const float UI_HEIGHT = 80f;
 
         private void Awake()
         {
@@ -64,12 +64,12 @@ namespace NexonGame.BlueArchive.Combat
             bgImage.sprite = CreateWhiteSprite();
             bgImage.color = new Color(0.1f, 0.1f, 0.15f, 0.9f);
 
-            // Anchored Position (화면 상단 중앙)
+            // Anchored Position (지정된 위치)
             var bgRect = bgPanel.GetComponent<RectTransform>();
             bgRect.anchorMin = new Vector2(0.5f, 1f);
             bgRect.anchorMax = new Vector2(0.5f, 1f);
             bgRect.pivot = new Vector2(0.5f, 1f);
-            bgRect.anchoredPosition = new Vector2(0, -20);
+            bgRect.anchoredPosition = new Vector2(631, -1011);
 
             // Slider 생성
             CreateSlider(bgPanel.transform);

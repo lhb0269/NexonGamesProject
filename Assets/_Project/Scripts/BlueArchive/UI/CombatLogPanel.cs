@@ -73,7 +73,7 @@ namespace NexonGame.BlueArchive.UI
 
             var titleRect = titleObj.AddComponent<RectTransform>();
             titleRect.sizeDelta = new Vector2(UI_WIDTH - 20, 30);
-            titleRect.anchoredPosition = new Vector2(0, -15);
+            titleRect.anchoredPosition = new Vector2(0, 130);
 
             var titleText = titleObj.AddComponent<Text>();
             titleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -99,7 +99,7 @@ namespace NexonGame.BlueArchive.UI
 
             var scrollViewRect = scrollViewObj.AddComponent<RectTransform>();
             scrollViewRect.sizeDelta = new Vector2(UI_WIDTH - 20, UI_HEIGHT - 60);
-            scrollViewRect.anchoredPosition = new Vector2(0, -20 - (UI_HEIGHT - 60) / 2);
+            scrollViewRect.anchoredPosition = new Vector2(0, 130);
 
             _scrollRect = scrollViewObj.AddComponent<ScrollRect>();
             _scrollRect.horizontal = false;
