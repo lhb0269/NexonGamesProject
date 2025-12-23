@@ -540,14 +540,14 @@ namespace NexonGame.Tests.PlayMode
             );
 
             Assert.IsNotNull(rewardResult, "보상 결과 존재");
-            Assert.IsNotEmpty(rewardResult.Rewards, "보상 항목이 있어야 함");
+            Assert.IsNotEmpty(rewardResult.GrantedRewards, "보상 항목이 있어야 함");
 
-            Debug.Log($"  ✓ 보상 개수: {rewardResult.Rewards.Count}개");
+            Debug.Log($"  ✓ 보상 개수: {rewardResult.GrantedRewards.Count}개");
 
-            foreach (var reward in rewardResult.Rewards)
+            foreach (var reward in rewardResult.GrantedRewards)
             {
-                Debug.Log($"    - {reward.ItemName} x{reward.Quantity}");
-                Assert.Greater(reward.Quantity, 0, "보상 수량이 0보다 커야 함");
+                Debug.Log($"    - {reward.itemName} x{reward.quantity}");
+                Assert.Greater(reward.quantity, 0, "보상 수량이 0보다 커야 함");
             }
 
             // 스테이지 클리어

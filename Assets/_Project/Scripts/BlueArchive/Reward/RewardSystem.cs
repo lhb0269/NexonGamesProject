@@ -60,6 +60,48 @@ namespace NexonGame.BlueArchive.Reward
         }
 
         /// <summary>
+        /// 보상 계산 (테스트용)
+        /// </summary>
+        public RewardGrantResult CalculateRewards(string stageName, int totalMoves, CombatLogSystem combatLog)
+        {
+            RewardGrantResult result = new RewardGrantResult();
+
+            // 기본 보상 생성
+            result.GrantedRewards.Add(new RewardItemData
+            {
+                itemName = "크레딧",
+                itemType = RewardItemType.Currency,
+                quantity = 1000
+            });
+
+            result.GrantedRewards.Add(new RewardItemData
+            {
+                itemName = "노트",
+                itemType = RewardItemType.Material,
+                quantity = 5
+            });
+
+            result.GrantedRewards.Add(new RewardItemData
+            {
+                itemName = "T1 가방",
+                itemType = RewardItemType.Equipment,
+                quantity = 1
+            });
+
+            result.GrantedRewards.Add(new RewardItemData
+            {
+                itemName = "전술 EXP",
+                itemType = RewardItemType.Exp,
+                quantity = 150
+            });
+
+            result.Success = true;
+            result.TotalRewardCount = result.GrantedRewards.Count;
+
+            return result;
+        }
+
+        /// <summary>
         /// 스테이지 클리어 보상 지급
         /// </summary>
         public RewardGrantResult GrantStageRewards(StageData stageData, CombatResult combatResult)
