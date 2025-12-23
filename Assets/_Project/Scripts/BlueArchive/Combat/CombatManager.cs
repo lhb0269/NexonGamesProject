@@ -40,6 +40,9 @@ namespace NexonGame.BlueArchive.Combat
         private Dictionary<Student, StudentObject> _studentObjectMap;
         private Dictionary<Enemy, EnemyObject> _enemyObjectMap;
 
+        // UI 컴포넌트
+        private CostDisplay _costDisplay;
+
         // 프로퍼티
         public CombatSystem CombatSystem => _combatSystem;
         public CombatState CurrentState => _combatSystem?.CurrentState ?? CombatState.NotStarted;
@@ -100,6 +103,9 @@ namespace NexonGame.BlueArchive.Combat
             // GameObject 생성
             CreateStudentObjects(students);
             CreateEnemyObjects(enemies);
+
+            // UI 생성
+            CreateCostDisplay();
 
             Debug.Log($"[CombatManager] 전투 초기화 완료: {students.Count}명 학생 vs {enemies.Count}명 적");
         }
@@ -226,6 +232,24 @@ namespace NexonGame.BlueArchive.Combat
         }
 
         /// <summary>
+        /// 코스트 UI 생성
+        /// </summary>
+        private void CreateCostDisplay()
+        {
+            if (_costDisplay != null)
+            {
+                Destroy(_costDisplay.gameObject);
+            }
+
+            var costDisplayObj = new GameObject("CostDisplay");
+            costDisplayObj.transform.SetParent(transform);
+            _costDisplay = costDisplayObj.AddComponent<CostDisplay>();
+
+            // 초기 코스트 표시
+            UpdateCostDisplay();
+        }
+
+        /// <summary>
         /// 학생 스킬 사용
         /// </summary>
         public SkillExecutionResult UseStudentSkill(int studentIndex)
@@ -274,6 +298,22 @@ namespace NexonGame.BlueArchive.Combat
                     Debug.Log($"[CombatManager] {enemyObj.Enemy.Data.enemyName} 격파!");
                 }
             }
+
+            // 코스트 UI 업데이트
+            UpdateCostDisplay();
+        }
+
+        /// <summary>
+        /// 코스트 UI 업데이트
+        /// </summary>
+        private void UpdateCostDisplay()
+        {
+            if (_costDisplay == null || _costSystem == null) return;
+
+            // 회복 중인지 확인 (최대 코스트가 아닌 경우)
+            bool isRegenerating = CurrentCost < MaxCost && CurrentState == CombatState.InProgress;
+
+            _costDisplay.UpdateCost(CurrentCost, MaxCost, isRegenerating);
         }
 
         /// <summary>
@@ -284,6 +324,9 @@ namespace NexonGame.BlueArchive.Combat
             if (_combatSystem != null && CurrentState == CombatState.InProgress)
             {
                 _combatSystem.Update(Time.deltaTime);
+
+                // 코스트 UI 업데이트 (매 프레임)
+                UpdateCostDisplay();
             }
         }
 
@@ -376,6 +419,13 @@ namespace NexonGame.BlueArchive.Combat
         {
             ClearStudentObjects();
             ClearEnemyObjects();
+
+            // UI 제거
+            if (_costDisplay != null)
+            {
+                Destroy(_costDisplay.gameObject);
+                _costDisplay = null;
+            }
 
             _combatSystem = null;
             _costSystem = null;

@@ -281,5 +281,57 @@ namespace NexonGame.Tests.PlayMode
 
             Debug.Log($"✅ [PlayMode Test] 코스트 {initialCost} → {finalCost}");
         }
+
+        [UnityTest]
+        public IEnumerator CombatManager_CostDisplay_ShouldExist()
+        {
+            Debug.Log("=== 테스트 시작: 코스트 UI 존재 확인 ===");
+
+            // Arrange
+            _combatManager.InitializeCombat(_testStudents, _testEnemies);
+            yield return null;
+
+            // Act
+            var costDisplay = Object.FindFirstObjectByType<CostDisplay>();
+
+            // Assert
+            Assert.IsNotNull(costDisplay, "CostDisplay가 생성되어야 함");
+
+            Debug.Log("✅ [PlayMode Test] CostDisplay 존재 확인");
+            yield return new WaitForSeconds(0.5f); // [시각화용] UI 확인
+        }
+
+        [UnityTest]
+        public IEnumerator CombatManager_CostDisplay_ShouldUpdateOnSkillUse()
+        {
+            Debug.Log("=== 테스트 시작: 스킬 사용 시 코스트 UI 업데이트 ===");
+
+            // Arrange
+            _combatManager.InitializeCombat(_testStudents, _testEnemies);
+            yield return null;
+
+            // 코스트 충전 대기
+            yield return new WaitForSeconds(2f);
+
+            int costBefore = _combatManager.CurrentCost;
+            Debug.Log($"스킬 사용 전 코스트: {costBefore}");
+
+            // Act - 스킬 사용
+            var result = _combatManager.UseStudentSkill(0);
+            yield return null;
+
+            int costAfter = _combatManager.CurrentCost;
+            Debug.Log($"스킬 사용 후 코스트: {costAfter}");
+
+            // Assert
+            Assert.IsNotNull(result, "스킬 결과가 있어야 함");
+            Assert.Less(costAfter, costBefore, "코스트가 감소해야 함");
+
+            var costDisplay = Object.FindFirstObjectByType<CostDisplay>();
+            Assert.IsNotNull(costDisplay, "CostDisplay가 존재해야 함");
+
+            Debug.Log($"✅ [PlayMode Test] 코스트 UI 업데이트 확인: {costBefore} → {costAfter}");
+            yield return new WaitForSeconds(1f); // [시각화용] 코스트 회복 관찰
+        }
     }
 }
