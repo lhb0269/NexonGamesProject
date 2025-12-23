@@ -135,31 +135,37 @@ namespace NexonGame.BlueArchive.Stage
         }
 
         /// <summary>
-        /// 두 위치가 인접한지 확인 (상하좌우)
+        /// 두 위치가 인접한지 확인 (상하좌우 + 대각선)
         /// </summary>
         public bool IsAdjacent(Vector2Int from, Vector2Int to)
         {
             int dx = Mathf.Abs(from.x - to.x);
             int dy = Mathf.Abs(from.y - to.y);
 
-            // 상하좌우만 인접으로 간주 (대각선 제외)
-            return (dx == 1 && dy == 0) || (dx == 0 && dy == 1);
+            // 상하좌우 + 대각선 모두 인접으로 간주
+            // 한 칸 차이 (상하좌우: dx=1,dy=0 or dx=0,dy=1)
+            // 대각선: dx=1,dy=1
+            return dx <= 1 && dy <= 1 && dx + dy > 0;
         }
 
         /// <summary>
-        /// 인접한 이동 가능한 셀 목록 반환
+        /// 인접한 이동 가능한 셀 목록 반환 (8방향)
         /// </summary>
         public List<Vector2Int> GetAdjacentWalkableCells(Vector2Int position)
         {
             List<Vector2Int> adjacent = new List<Vector2Int>();
 
-            // 상하좌우 체크
+            // 상하좌우 + 대각선 (8방향)
             Vector2Int[] directions = new Vector2Int[]
             {
                 new Vector2Int(0, 1),   // 위
                 new Vector2Int(0, -1),  // 아래
                 new Vector2Int(-1, 0),  // 왼쪽
-                new Vector2Int(1, 0)    // 오른쪽
+                new Vector2Int(1, 0),   // 오른쪽
+                new Vector2Int(-1, 1),  // 왼쪽 위 (대각선)
+                new Vector2Int(1, 1),   // 오른쪽 위 (대각선)
+                new Vector2Int(-1, -1), // 왼쪽 아래 (대각선)
+                new Vector2Int(1, -1)   // 오른쪽 아래 (대각선)
             };
 
             foreach (var dir in directions)
