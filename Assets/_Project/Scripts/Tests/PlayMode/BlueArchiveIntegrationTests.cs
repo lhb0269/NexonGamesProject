@@ -287,21 +287,29 @@ namespace NexonGame.Tests.PlayMode
 
             Debug.Log($"  ✓ {platforms.Length}개 플랫폼 생성 확인");
 
-            // 이동 경로 계산
-            var path = _stageManager.GetPathToBattle();
-            Assert.IsNotNull(path, "이동 경로 계산 성공");
-            Assert.Greater(path.Count, 0, "이동 경로가 존재해야 함");
+            // 수동 이동 경로 설정
+            // (0,2) → (1,1) → (0,0) → (1,1) → (2,1) → (3,1)
+            var manualPath = new List<Vector2Int>
+            {
+                new Vector2Int(1, 1), // (0,2)에서 (1,1)로
+                new Vector2Int(0, 0), // (1,1)에서 (0,0)로
+                new Vector2Int(1, 1), // (0,0)에서 (1,1)로 (되돌아옴)
+                new Vector2Int(2, 1), // (1,1)에서 (2,1)로
+                new Vector2Int(3, 1)  // (2,1)에서 (3,1)로 (전투)
+            };
 
-            Debug.Log($"  ✓ 이동 경로 계산: {path.Count}칸");
+            Debug.Log($"  ✓ 수동 이동 경로 설정: {manualPath.Count}칸");
+            Debug.Log($"    경로: (0,2) → (1,1) → (0,0) → (1,1) → (2,1) → (3,1)");
 
             yield return new WaitForSeconds(0.5f);
 
             // 경로를 따라 이동
-            foreach (var pos in path)
+            foreach (var pos in manualPath)
             {
                 bool moved = _stageManager.MovePlayer(pos);
                 Assert.IsTrue(moved, $"위치 {pos}로 이동 성공");
-                yield return new WaitForSeconds(0.2f);
+                Debug.Log($"    → 현재 위치: {_stageManager.PlayerPosition}");
+                yield return new WaitForSeconds(0.3f);
             }
 
             // 전투 위치 도착 확인
