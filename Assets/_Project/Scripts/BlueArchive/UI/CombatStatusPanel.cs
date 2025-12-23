@@ -239,6 +239,14 @@ namespace NexonGame.BlueArchive.UI
         }
 
         /// <summary>
+        /// 매 프레임 업데이트 (스킬 쿨다운 실시간 갱신)
+        /// </summary>
+        private void Update()
+        {
+            UpdateAllStudents();
+        }
+
+        /// <summary>
         /// 모든 학생 상태 업데이트
         /// </summary>
         public void UpdateAllStudents()
