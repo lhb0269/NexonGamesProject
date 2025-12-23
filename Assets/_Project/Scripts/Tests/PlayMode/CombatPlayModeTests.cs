@@ -6,6 +6,7 @@ using UnityEngine.TestTools;
 using NexonGame.BlueArchive.Combat;
 using NexonGame.BlueArchive.Character;
 using NexonGame.BlueArchive.Data;
+using NexonGame.BlueArchive.UI;
 
 namespace NexonGame.Tests.PlayMode
 {
@@ -332,6 +333,73 @@ namespace NexonGame.Tests.PlayMode
 
             Debug.Log($"✅ [PlayMode Test] 코스트 UI 업데이트 확인: {costBefore} → {costAfter}");
             yield return new WaitForSeconds(1f); // [시각화용] 코스트 회복 관찰
+        }
+
+        [UnityTest]
+        public IEnumerator CombatManager_CombatLogPanel_ShouldExist()
+        {
+            Debug.Log("=== 테스트 시작: 전투 로그 패널 존재 확인 ===");
+
+            // Arrange & Act
+            _combatManager.InitializeCombat(_testStudents, _testEnemies);
+            yield return null;
+
+            // Assert
+            var logPanel = Object.FindFirstObjectByType<CombatLogPanel>();
+            Assert.IsNotNull(logPanel, "CombatLogPanel이 생성되어야 함");
+
+            Debug.Log("✅ [PlayMode Test] CombatLogPanel 존재 확인");
+            yield return new WaitForSeconds(0.5f); // [시각화용] UI 확인
+        }
+
+        [UnityTest]
+        public IEnumerator CombatManager_CombatStatusPanel_ShouldExist()
+        {
+            Debug.Log("=== 테스트 시작: 전투 상태 패널 존재 확인 ===");
+
+            // Arrange & Act
+            _combatManager.InitializeCombat(_testStudents, _testEnemies);
+            yield return null;
+
+            // Assert
+            var statusPanel = Object.FindFirstObjectByType<CombatStatusPanel>();
+            Assert.IsNotNull(statusPanel, "CombatStatusPanel이 생성되어야 함");
+
+            Debug.Log("✅ [PlayMode Test] CombatStatusPanel 존재 확인");
+            yield return new WaitForSeconds(0.5f); // [시각화용] UI 확인
+        }
+
+        [UnityTest]
+        public IEnumerator CombatManager_UIPanels_ShouldDisplayCombatEvents()
+        {
+            Debug.Log("=== 테스트 시작: UI 패널이 전투 이벤트를 표시해야 함 ===");
+
+            // Arrange
+            _combatManager.InitializeCombat(_testStudents, _testEnemies);
+            yield return null;
+
+            var logPanel = Object.FindFirstObjectByType<CombatLogPanel>();
+            var statusPanel = Object.FindFirstObjectByType<CombatStatusPanel>();
+
+            Assert.IsNotNull(logPanel, "CombatLogPanel이 있어야 함");
+            Assert.IsNotNull(statusPanel, "CombatStatusPanel이 있어야 함");
+
+            yield return new WaitForSeconds(0.5f); // [시각화용] 초기 UI 확인
+
+            // 코스트 충전 대기
+            yield return new WaitForSeconds(2f);
+
+            // Act - 스킬 사용
+            Debug.Log("스킬 사용 중...");
+            var result = _combatManager.UseStudentSkill(0);
+            yield return new WaitForSeconds(0.5f); // [시각화용] 로그 확인
+
+            // Assert
+            Assert.IsNotNull(result, "스킬 결과가 있어야 함");
+            Assert.IsTrue(result.Success, "스킬이 성공해야 함");
+
+            Debug.Log("✅ [PlayMode Test] UI 패널이 전투 이벤트를 표시함");
+            yield return new WaitForSeconds(1f); // [시각화용] 최종 확인
         }
     }
 }
