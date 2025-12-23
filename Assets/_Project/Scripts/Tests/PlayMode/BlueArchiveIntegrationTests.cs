@@ -111,47 +111,59 @@ namespace NexonGame.Tests.PlayMode
             var students = new List<StudentData>();
 
             // Shiroko
+            var shirokoSkill = ScriptableObject.CreateInstance<SkillData>();
+            shirokoSkill.skillName = "EX - 목표 사격";
+            shirokoSkill.costAmount = 3;
+            shirokoSkill.cooldownTime = 20f;
+            shirokoSkill.baseDamage = 1250;
+            shirokoSkill.targetType = SkillTargetType.Single;
+
             var shiroko = ScriptableObject.CreateInstance<StudentData>();
             shiroko.studentName = "Shiroko";
             shiroko.maxHP = 2431;
-            shiroko.skillName = "EX - 목표 사격";
-            shiroko.skillCost = 3;
-            shiroko.skillCooldown = 20f;
-            shiroko.skillDamage = 1250;
-            shiroko.skillTargetCount = 1;
+            shiroko.exSkill = shirokoSkill;
             students.Add(shiroko);
 
             // Hoshino
+            var hoshinoSkill = ScriptableObject.CreateInstance<SkillData>();
+            hoshinoSkill.skillName = "EX - 방패 전개";
+            hoshinoSkill.costAmount = 2;
+            hoshinoSkill.cooldownTime = 15f;
+            hoshinoSkill.baseDamage = 800;
+            hoshinoSkill.targetType = SkillTargetType.Single;
+
             var hoshino = ScriptableObject.CreateInstance<StudentData>();
             hoshino.studentName = "Hoshino";
             hoshino.maxHP = 3512;
-            hoshino.skillName = "EX - 방패 전개";
-            hoshino.skillCost = 2;
-            hoshino.skillCooldown = 15f;
-            hoshino.skillDamage = 800;
-            hoshino.skillTargetCount = 1;
+            hoshino.exSkill = hoshinoSkill;
             students.Add(hoshino);
 
             // Aru
+            var aruSkill = ScriptableObject.CreateInstance<SkillData>();
+            aruSkill.skillName = "EX - 섬광탄";
+            aruSkill.costAmount = 4;
+            aruSkill.cooldownTime = 25f;
+            aruSkill.baseDamage = 1500;
+            aruSkill.targetType = SkillTargetType.Multiple;
+
             var aru = ScriptableObject.CreateInstance<StudentData>();
             aru.studentName = "Aru";
             aru.maxHP = 2187;
-            aru.skillName = "EX - 섬광탄";
-            aru.skillCost = 4;
-            aru.skillCooldown = 25f;
-            aru.skillDamage = 1500;
-            aru.skillTargetCount = 2;
+            aru.exSkill = aruSkill;
             students.Add(aru);
 
             // Haruna
+            var harunaSkill = ScriptableObject.CreateInstance<SkillData>();
+            harunaSkill.skillName = "EX - 집중 사격";
+            harunaSkill.costAmount = 5;
+            harunaSkill.cooldownTime = 30f;
+            harunaSkill.baseDamage = 2100;
+            harunaSkill.targetType = SkillTargetType.Single;
+
             var haruna = ScriptableObject.CreateInstance<StudentData>();
             haruna.studentName = "Haruna";
             haruna.maxHP = 2089;
-            haruna.skillName = "EX - 집중 사격";
-            haruna.skillCost = 5;
-            haruna.skillCooldown = 30f;
-            haruna.skillDamage = 2100;
-            haruna.skillTargetCount = 1;
+            haruna.exSkill = harunaSkill;
             students.Add(haruna);
 
             return students;
@@ -164,9 +176,9 @@ namespace NexonGame.Tests.PlayMode
         {
             var enemies = new List<EnemyData>();
 
-            enemies.Add(new EnemyData { enemyName = "일반병 A", maxHP = 1200 });
-            enemies.Add(new EnemyData { enemyName = "일반병 B", maxHP = 1200 });
-            enemies.Add(new EnemyData { enemyName = "정예병", maxHP = 2500 });
+            enemies.Add(new EnemyData("일반병 A", 1200, 50, 20));
+            enemies.Add(new EnemyData("일반병 B", 1200, 50, 20));
+            enemies.Add(new EnemyData("정예병", 2500, 80, 30));
 
             return enemies;
         }
