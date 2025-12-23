@@ -314,6 +314,16 @@ namespace NexonGame.Tests.PlayMode
             _testProgressPanel.UpdateCheckpoint(1, CheckpointStatus.Completed);
             _testProgressPanel.UpdateMessage("플랫폼 이동 완료!");
             yield return new WaitForSeconds(0.5f);
+
+            // 체크포인트 #1 정리: 생성된 플랫폼 제거
+            // (PlayerMarker는 StageManager가 관리하므로 별도 정리 불필요)
+            platforms = Object.FindObjectsByType<PlatformObject>(FindObjectsSortMode.None);
+            foreach (var platform in platforms)
+            {
+                Object.Destroy(platform.gameObject);
+            }
+            Debug.Log($"  🧹 플랫폼 {platforms.Length}개 정리 완료");
+            yield return null;
         }
 
         /// <summary>
@@ -569,6 +579,27 @@ namespace NexonGame.Tests.PlayMode
             _testProgressPanel.UpdateCheckpoint(6, CheckpointStatus.Completed);
             _testProgressPanel.UpdateMessage("보상 획득 완료!");
             yield return new WaitForSeconds(1f);
+
+            // 체크포인트 #6 정리: 전투 관련 오브젝트 제거
+            var studentObjects = Object.FindObjectsByType<StudentObject>(FindObjectsSortMode.None);
+            var enemyObjects = Object.FindObjectsByType<EnemyObject>(FindObjectsSortMode.None);
+            var costDisplay = Object.FindFirstObjectByType<CostDisplay>();
+            var combatLogPanel = Object.FindFirstObjectByType<CombatLogPanel>();
+            var combatStatusPanel = Object.FindFirstObjectByType<CombatStatusPanel>();
+
+            foreach (var student in studentObjects)
+                Object.Destroy(student.gameObject);
+            foreach (var enemy in enemyObjects)
+                Object.Destroy(enemy.gameObject);
+            if (costDisplay != null)
+                Object.Destroy(costDisplay.gameObject);
+            if (combatLogPanel != null)
+                Object.Destroy(combatLogPanel.gameObject);
+            if (combatStatusPanel != null)
+                Object.Destroy(combatStatusPanel.gameObject);
+
+            Debug.Log($"  🧹 전투 오브젝트 정리 완료 (학생 {studentObjects.Length}명, 적 {enemyObjects.Length}명, UI 패널 3개)");
+            yield return null;
         }
     }
 }
