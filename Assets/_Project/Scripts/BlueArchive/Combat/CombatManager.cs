@@ -420,7 +420,7 @@ namespace NexonGame.BlueArchive.Combat
         public int EnemyCount => _enemyObjects.Count;
 
         /// <summary>
-        /// 살아있는 적 개수
+        /// 살아있는 적 개수 (프로퍼티)
         /// </summary>
         public int AliveEnemyCount
         {
@@ -433,6 +433,14 @@ namespace NexonGame.BlueArchive.Combat
                 }
                 return count;
             }
+        }
+
+        /// <summary>
+        /// 살아있는 적 개수 (메서드)
+        /// </summary>
+        public int GetAliveEnemyCount()
+        {
+            return AliveEnemyCount;
         }
 
         /// <summary>

@@ -23,5 +23,12 @@ namespace NexonGame.BlueArchive.Data
         [Header("비주얼")]
         public Sprite portrait;
         public Color teamColor = Color.blue;
+
+        // 편의 프로퍼티 (테스트용)
+        public string skillName => exSkill != null ? exSkill.skillName : "Unknown Skill";
+        public int skillCost => exSkill != null ? exSkill.costAmount : 3;
+        public float skillCooldown => exSkill != null ? exSkill.cooldownTime : 20f;
+        public int skillDamage => exSkill != null ? exSkill.baseDamage : 500;
+        public int skillTargetCount => exSkill != null ? (exSkill.targetType == SkillTargetType.Single ? 1 : 2) : 1;
     }
 }
