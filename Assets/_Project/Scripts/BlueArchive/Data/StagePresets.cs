@@ -25,21 +25,21 @@ namespace NexonGame.BlueArchive.Data
             stageData.gridHeight = 3;
 
             // 시작 위치와 전투 위치
-            stageData.startPosition = new Vector2Int(0, 2); // 왼쪽 하단
+            stageData.startPosition = new Vector2Int(0, 0); // 왼쪽 상단
             stageData.battlePosition = new Vector2Int(3, 1); // 오른쪽 중앙 (전투)
 
             // 플랫폼 위치
             // 레이아웃:
             //       0   1   2   3
-            //   0   -
+            //   0   S              (시작)
             //   1       -   -   B  (일반-일반-전투)
-            //   2   S              (시작)
+            //   2   -              (일반)
             stageData.platformPositions = new List<Vector2Int>
             {
-                new Vector2Int(0, 0), // 일반 플랫폼 1 (상단)
+                new Vector2Int(0, 2), // 일반 플랫폼 1 (하단)
                 new Vector2Int(1, 1), // 일반 플랫폼 2 (중앙)
                 new Vector2Int(2, 1)  // 일반 플랫폼 3 (중앙)
-                // (0, 2)은 startPosition으로 자동 생성됨
+                // (0, 0)은 startPosition으로 자동 생성됨
                 // (3, 1)은 battlePosition으로 자동 생성됨
             };
 
@@ -142,17 +142,17 @@ namespace NexonGame.BlueArchive.Data
 
 ## 맵 구성
 - 그리드: 4x3
-- 시작 위치: (0, 2)
+- 시작 위치: (0, 0)
 - 전투 위치: (3, 1) - 빨간색 전투 플랫폼
 - 레이아웃:
         0   1   2   3
-    0   -
+    0   [S]              (시작)
     1       -   -   [B]  (일반-일반-전투)
-    2   [S]              (시작)
+    2   -                (일반)
 
 ## 플랫폼 구성 (총 5개)
-- 시작 플랫폼: 1개 (0,2) - 초록색
-- 일반 플랫폼: 3개 (0,0), (1,1), (2,1) - 회색
+- 시작 플랫폼: 1개 (0,0) - 초록색
+- 일반 플랫폼: 3개 (0,2), (1,1), (2,1) - 회색
 - 전투 플랫폼: 1개 (3,1) - 빨간색
 
 ## 적 구성

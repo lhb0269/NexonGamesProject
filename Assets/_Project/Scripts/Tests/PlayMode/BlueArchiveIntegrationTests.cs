@@ -288,18 +288,18 @@ namespace NexonGame.Tests.PlayMode
             Debug.Log($"  ✓ {platforms.Length}개 플랫폼 생성 확인");
 
             // 수동 이동 경로 설정
-            // (0,2) → (1,1) → (0,0) → (1,1) → (2,1) → (3,1)
+            // (0,0) → (1,1) → (0,2) → (1,1) → (2,1) → (3,1)
             var manualPath = new List<Vector2Int>
             {
-                new Vector2Int(1, 1), // (0,2)에서 (1,1)로
-                new Vector2Int(0, 0), // (1,1)에서 (0,0)로
-                new Vector2Int(1, 1), // (0,0)에서 (1,1)로 (되돌아옴)
+                new Vector2Int(1, 1), // (0,0)에서 (1,1)로
+                new Vector2Int(0, 2), // (1,1)에서 (0,2)로
+                new Vector2Int(1, 1), // (0,2)에서 (1,1)로 (되돌아옴)
                 new Vector2Int(2, 1), // (1,1)에서 (2,1)로
                 new Vector2Int(3, 1)  // (2,1)에서 (3,1)로 (전투)
             };
 
             Debug.Log($"  ✓ 수동 이동 경로 설정: {manualPath.Count}칸");
-            Debug.Log($"    경로: (0,2) → (1,1) → (0,0) → (1,1) → (2,1) → (3,1)");
+            Debug.Log($"    경로: (0,0) → (1,1) → (0,2) → (1,1) → (2,1) → (3,1)");
 
             yield return new WaitForSeconds(0.5f);
 
