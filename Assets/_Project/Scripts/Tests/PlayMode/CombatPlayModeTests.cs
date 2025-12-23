@@ -76,7 +76,7 @@ namespace NexonGame.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown()
         {
-            // 테스트 데이터 정리
+            // ScriptableObject 정리
             foreach (var student in _testStudents)
             {
                 if (student != null)
@@ -98,6 +98,9 @@ namespace NexonGame.Tests.PlayMode
             {
                 Object.Destroy(_testSceneRoot);
             }
+
+            _testStudents?.Clear();
+            _testEnemies?.Clear();
 
             yield return null;
         }
