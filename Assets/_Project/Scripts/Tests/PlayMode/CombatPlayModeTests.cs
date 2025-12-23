@@ -76,7 +76,7 @@ namespace NexonGame.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown()
         {
-            // ScriptableObject 정리
+            // StudentData는 ScriptableObject이므로 파괴 필요
             foreach (var student in _testStudents)
             {
                 if (student != null)
@@ -85,13 +85,8 @@ namespace NexonGame.Tests.PlayMode
                 }
             }
 
-            foreach (var enemy in _testEnemies)
-            {
-                if (enemy != null)
-                {
-                    Object.DestroyImmediate(enemy);
-                }
-            }
+            // EnemyData는 일반 클래스이므로 파괴 불필요 (GC가 처리)
+            _testEnemies?.Clear();
 
             // 테스트 오브젝트 제거
             if (_testSceneRoot != null)
@@ -100,7 +95,6 @@ namespace NexonGame.Tests.PlayMode
             }
 
             _testStudents?.Clear();
-            _testEnemies?.Clear();
 
             yield return null;
         }
