@@ -582,11 +582,32 @@ namespace NexonGame.Tests.PlayMode
             Assert.AreEqual(StageState.StageCleared, _stageManager.CurrentState, "스테이지 클리어 상태");
             Debug.Log("  ✓ 스테이지 클리어");
 
+            // RewardResultPanel 생성 및 표시
+            var rewardPanelObj = new GameObject("RewardResultPanel");
+            var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
+            yield return null;
+
+            // 통계 정보 생성
+            var combatLog = _combatManager.CombatSystem.CombatLog;
+            string statistics = $"총 이동 횟수: {_stageManager.TotalMovesInStage}회\n" +
+                              $"스킬 사용: {combatLog.TotalSkillsUsed}회\n" +
+                              $"총 데미지: {combatLog.TotalDamageDealt}\n" +
+                              $"격파한 적: {combatLog.TotalEnemiesDefeated}명";
+
+            // 보상 패널 표시
+            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult, statistics);
+            Debug.Log("  ✓ RewardResultPanel 표시");
+
+            yield return new WaitForSeconds(3f); // 보상 패널 확인 시간
+
             Debug.Log("[체크포인트 #6] ✅ 통과");
 
             _testProgressPanel.UpdateCheckpoint(6, CheckpointStatus.Completed);
             _testProgressPanel.UpdateMessage("보상 획득 완료!");
             yield return new WaitForSeconds(1f);
+
+            // RewardResultPanel 제거
+            Object.Destroy(rewardPanelObj);
 
             // 체크포인트 #6 정리: 전투 관련 오브젝트 제거
             var studentObjects = Object.FindObjectsByType<StudentObject>(FindObjectsSortMode.None);
