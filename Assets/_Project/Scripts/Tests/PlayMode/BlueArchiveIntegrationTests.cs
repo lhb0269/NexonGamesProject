@@ -512,14 +512,10 @@ namespace NexonGame.Tests.PlayMode
                 yield return new WaitForSeconds(0.5f);
             }
 
-            // 학생별 데미지 통계
-            var studentStats = combatLog.GetStudentStatistics();
-            foreach (var stat in studentStats)
-            {
-                Debug.Log($"  [{stat.StudentName}] 스킬 사용: {stat.SkillUsageCount}회, 데미지: {stat.TotalDamage}");
-            }
-
+            // 전투 통계
             Debug.Log($"  ✓ 최종 총 데미지: {combatLog.TotalDamageDealt}");
+            Debug.Log($"  ✓ 총 스킬 사용: {combatLog.TotalSkillsUsed}회");
+            Debug.Log($"  ✓ 격파한 적: {combatLog.TotalEnemiesDefeated}명");
             Debug.Log("[체크포인트 #5] ✅ 통과");
 
             _testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.Completed);
@@ -536,8 +532,7 @@ namespace NexonGame.Tests.PlayMode
             _testProgressPanel.UpdateCheckpoint(6, CheckpointStatus.InProgress);
             _testProgressPanel.UpdateMessage("보상 검증 중...");
 
-            // 전투 완료
-            _combatManager.CombatSystem.CompleteCombat(victory: true);
+            // 전투 완료 (스테이지에서만 처리)
             _stageManager.CompleteBattle(victory: true);
             yield return null;
 
