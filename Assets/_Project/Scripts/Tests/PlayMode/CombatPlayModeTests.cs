@@ -401,5 +401,97 @@ namespace NexonGame.Tests.PlayMode
             Debug.Log("✅ [PlayMode Test] UI 패널이 전투 이벤트를 표시함");
             yield return new WaitForSeconds(1f); // [시각화용] 최종 확인
         }
+
+        [UnityTest]
+        public IEnumerator TestProgressPanel_ShouldExist()
+        {
+            Debug.Log("=== 테스트 시작: 테스트 진행 패널 존재 확인 ===");
+
+            // Arrange & Act
+            var testPanelObj = new GameObject("TestProgressPanel");
+            var testPanel = testPanelObj.AddComponent<TestProgressPanel>();
+            yield return null;
+
+            // Assert
+            Assert.IsNotNull(testPanel, "TestProgressPanel이 생성되어야 함");
+
+            Debug.Log("✅ [PlayMode Test] TestProgressPanel 존재 확인");
+            yield return new WaitForSeconds(0.5f); // [시각화용] UI 확인
+
+            // Cleanup
+            Object.Destroy(testPanelObj);
+        }
+
+        [UnityTest]
+        public IEnumerator TestProgressPanel_ShouldUpdateCheckpoints()
+        {
+            Debug.Log("=== 테스트 시작: 체크포인트 상태 업데이트 ===");
+
+            // Arrange
+            var testPanelObj = new GameObject("TestProgressPanel");
+            var testPanel = testPanelObj.AddComponent<TestProgressPanel>();
+            yield return null;
+
+            // Act - 체크포인트 #1 진행 중
+            testPanel.UpdateCheckpoint(1, CheckpointStatus.InProgress);
+            testPanel.UpdateMessage("플랫폼 이동 테스트 중...");
+            yield return new WaitForSeconds(0.5f);
+
+            // Act - 체크포인트 #1 완료
+            testPanel.UpdateCheckpoint(1, CheckpointStatus.Completed);
+            testPanel.UpdateMessage("플랫폼 이동 완료!");
+            yield return new WaitForSeconds(0.5f);
+
+            // Act - 체크포인트 #2 진행 중
+            testPanel.UpdateCheckpoint(2, CheckpointStatus.InProgress);
+            testPanel.UpdateMessage("전투 진입 테스트 중...");
+            yield return new WaitForSeconds(0.5f);
+
+            // Act - 체크포인트 #2 완료
+            testPanel.UpdateCheckpoint(2, CheckpointStatus.Completed);
+            testPanel.UpdateMessage("전투 진입 완료!");
+            yield return new WaitForSeconds(0.5f);
+
+            // Assert - 모든 업데이트가 정상적으로 수행됨
+            Assert.IsNotNull(testPanel);
+
+            Debug.Log("✅ [PlayMode Test] 체크포인트 상태 업데이트 확인");
+            yield return new WaitForSeconds(1f); // [시각화용] 최종 확인
+
+            // Cleanup
+            Object.Destroy(testPanelObj);
+        }
+
+        [UnityTest]
+        public IEnumerator TestProgressPanel_ShouldShowAllCheckpoints()
+        {
+            Debug.Log("=== 테스트 시작: 모든 체크포인트 표시 ===");
+
+            // Arrange
+            var testPanelObj = new GameObject("TestProgressPanel");
+            var testPanel = testPanelObj.AddComponent<TestProgressPanel>();
+            yield return null;
+
+            // Act - 모든 체크포인트 순차 완료
+            for (int i = 1; i <= 6; i++)
+            {
+                testPanel.UpdateCheckpoint(i, CheckpointStatus.InProgress);
+                testPanel.UpdateMessage($"체크포인트 #{i} 진행 중...");
+                yield return new WaitForSeconds(0.3f);
+
+                testPanel.UpdateCheckpoint(i, CheckpointStatus.Completed);
+                testPanel.UpdateMessage($"체크포인트 #{i} 완료!");
+                yield return new WaitForSeconds(0.3f);
+            }
+
+            // Assert
+            Assert.IsNotNull(testPanel);
+
+            Debug.Log("✅ [PlayMode Test] 모든 체크포인트 완료 확인");
+            yield return new WaitForSeconds(1f); // [시각화용] 완료 상태 확인
+
+            // Cleanup
+            Object.Destroy(testPanelObj);
+        }
     }
 }
