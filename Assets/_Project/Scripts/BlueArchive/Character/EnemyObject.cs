@@ -51,6 +51,9 @@ namespace NexonGame.BlueArchive.Character
         {
             if (Enemy == null) return;
 
+            // 이미 비활성화된 경우 무시
+            if (!gameObject.activeSelf) return;
+
             // HP 비율에 따라 색상 변경
             float hpRatio = (float)Enemy.CurrentHP / Enemy.Data.maxHP;
             Color currentColor = Color.Lerp(Color.black, _enemyColor, hpRatio);
