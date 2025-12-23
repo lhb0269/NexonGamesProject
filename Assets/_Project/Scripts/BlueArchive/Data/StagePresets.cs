@@ -20,28 +20,27 @@ namespace NexonGame.BlueArchive.Data
             stageData.stageName = "Normal 1-4";
             stageData.stageId = 104;
 
-            // 그리드 설정 (3x5 그리드)
-            stageData.gridWidth = 3;
-            stageData.gridHeight = 5;
+            // 그리드 설정 (4x3 그리드)
+            stageData.gridWidth = 4;
+            stageData.gridHeight = 3;
 
             // 시작 위치와 전투 위치
-            stageData.startPosition = new Vector2Int(0, 2); // 왼쪽 중앙
-            stageData.battlePosition = new Vector2Int(1, 3); // 전투 플랫폼 (오른쪽 끝)
+            stageData.startPosition = new Vector2Int(0, 2); // 왼쪽 하단
+            stageData.battlePosition = new Vector2Int(3, 1); // 오른쪽 중앙 (전투)
 
             // 플랫폼 위치
             // 레이아웃:
-            // (0,0)
-            // (0,1) (1,1) - 상단 경로
-            // (0,2) (1,2) - 중앙 경로 (시작 위치)
-            // (0,3) (1,3) - 하단 경로 (전투 위치)
-            // (0,4)
+            //       0   1   2   3
+            //   0   -
+            //   1       -   -   B  (일반-일반-전투)
+            //   2   S              (시작)
             stageData.platformPositions = new List<Vector2Int>
             {
-                new Vector2Int(0, 0), // 상단 끝
-                new Vector2Int(0, 4), // 하단 끝
-                new Vector2Int(1, 1), // 전투 플랫폼 (상)
-                new Vector2Int(1, 2)  // 전투 플랫폼 (중)
-                // (1, 3)은 battlePosition으로 자동 생성됨
+                new Vector2Int(0, 0), // 일반 플랫폼 1 (상단)
+                new Vector2Int(1, 1), // 일반 플랫폼 2 (중앙)
+                new Vector2Int(2, 1)  // 일반 플랫폼 3 (중앙)
+                // (0, 2)은 startPosition으로 자동 생성됨
+                // (3, 1)은 battlePosition으로 자동 생성됨
             };
 
             // 적 스폰 데이터
@@ -50,7 +49,7 @@ namespace NexonGame.BlueArchive.Data
                 new EnemySpawnData
                 {
                     enemyName = "일반병 A",
-                    spawnPosition = new Vector2Int(2, 1),
+                    spawnPosition = new Vector2Int(3, 0),
                     hp = 1200,
                     attack = 50,
                     defense = 20
@@ -58,7 +57,7 @@ namespace NexonGame.BlueArchive.Data
                 new EnemySpawnData
                 {
                     enemyName = "일반병 B",
-                    spawnPosition = new Vector2Int(2, 2),
+                    spawnPosition = new Vector2Int(3, 1),
                     hp = 1200,
                     attack = 50,
                     defense = 20
@@ -66,7 +65,7 @@ namespace NexonGame.BlueArchive.Data
                 new EnemySpawnData
                 {
                     enemyName = "정예병",
-                    spawnPosition = new Vector2Int(2, 3),
+                    spawnPosition = new Vector2Int(3, 2),
                     hp = 2500,
                     attack = 80,
                     defense = 30
@@ -142,33 +141,32 @@ namespace NexonGame.BlueArchive.Data
 === Normal 1-4 스테이지 ===
 
 ## 맵 구성
-- 그리드: 3x5
+- 그리드: 4x3
 - 시작 위치: (0, 2)
-- 전투 위치: (1, 3) - 빨간색 전투 플랫폼
+- 전투 위치: (3, 1) - 빨간색 전투 플랫폼
 - 레이아웃:
-  (0,0)           -
-  (0,1) (1,1)      ---
-  (0,2) (1,2)      ---
-  (0,3) (1,3)      ---  [전투]
-  (0,4)           -
+        0   1   2   3
+    0   -
+    1       -   -   [B]  (일반-일반-전투)
+    2   [S]              (시작)
 
-## 전투 플랫폼
-- (1, 1), (1, 2), (1, 3) - 세 개의 전투 플랫폼
-- 어느 플랫폼에 진입하든 전투 시작
-- 시각적 표시: 빨간색
+## 플랫폼 구성 (총 5개)
+- 시작 플랫폼: 1개 (0,2) - 초록색
+- 일반 플랫폼: 3개 (0,0), (1,1), (2,1) - 회색
+- 전투 플랫폼: 1개 (3,1) - 빨간색
 
 ## 적 구성
 1. 일반병 A
    - HP: 1200 | ATK: 50 | DEF: 20
-   - 위치: (2, 1)
+   - 위치: (3, 0)
 
 2. 일반병 B
    - HP: 1200 | ATK: 50 | DEF: 20
-   - 위치: (2, 2)
+   - 위치: (3, 1)
 
 3. 정예병 (보스)
    - HP: 2500 | ATK: 80 | DEF: 30
-   - 위치: (2, 3)
+   - 위치: (3, 2)
 
 ## 클리어 조건
 - 모든 적 격파 (3명)
