@@ -99,7 +99,7 @@ namespace NexonGame.BlueArchive.UI
 
             var scrollViewRect = scrollViewObj.AddComponent<RectTransform>();
             scrollViewRect.sizeDelta = new Vector2(UI_WIDTH - 20, UI_HEIGHT - 60);
-            scrollViewRect.anchoredPosition = new Vector2(0, 130);
+            scrollViewRect.anchoredPosition = new Vector2(0, -13);
 
             _scrollRect = scrollViewObj.AddComponent<ScrollRect>();
             _scrollRect.horizontal = false;
