@@ -82,7 +82,7 @@ namespace NexonGame.BlueArchive.UI
 
             var titleRect = titleObj.AddComponent<RectTransform>();
             titleRect.sizeDelta = new Vector2(UI_WIDTH - 40, 40);
-            titleRect.anchoredPosition = new Vector2(0, -25);
+            titleRect.anchoredPosition = new Vector2(0, -25 + 180);
 
             _titleText = titleObj.AddComponent<Text>();
             _titleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -104,7 +104,7 @@ namespace NexonGame.BlueArchive.UI
 
             var messageRect = messageObj.AddComponent<RectTransform>();
             messageRect.sizeDelta = new Vector2(UI_WIDTH - 40, 40);
-            messageRect.anchoredPosition = new Vector2(0, -UI_HEIGHT + 30);
+            messageRect.anchoredPosition = new Vector2(0, -UI_HEIGHT + 30 + 180);
 
             _currentMessageText = messageObj.AddComponent<Text>();
             _currentMessageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -121,7 +121,7 @@ namespace NexonGame.BlueArchive.UI
         /// </summary>
         private void CreateCheckpointList(Transform parent)
         {
-            float startY = -80;
+            float startY = -80 + 180;
 
             for (int i = 0; i < _checkpointNames.Length; i++)
             {
@@ -197,7 +197,7 @@ namespace NexonGame.BlueArchive.UI
 
             var progressRect = progressObj.AddComponent<RectTransform>();
             progressRect.sizeDelta = new Vector2(UI_WIDTH - 80, 25);
-            progressRect.anchoredPosition = new Vector2(0, -UI_HEIGHT + 80);
+            progressRect.anchoredPosition = new Vector2(0, -UI_HEIGHT + 80 + 180);
 
             _progressBar = progressObj.AddComponent<Slider>();
             _progressBar.interactable = false;
