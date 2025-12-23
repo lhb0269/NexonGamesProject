@@ -127,7 +127,7 @@ namespace NexonGame.BlueArchive.Character
 
             return $"{Student.Data.studentName}\n" +
                    $"HP: {Student.CurrentHP}/{Student.Data.maxHP}\n" +
-                   $"Skill CD: {Student.CurrentSkillCooldown:F1}s";
+                   $"Skill CD: {Student.SkillCooldownRemaining:F1}s";
         }
 
         /// <summary>

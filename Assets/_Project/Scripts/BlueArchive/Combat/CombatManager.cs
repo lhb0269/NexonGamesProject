@@ -75,10 +75,10 @@ namespace NexonGame.BlueArchive.Combat
         public void InitializeCombat(List<StudentData> studentDataList, List<EnemyData> enemyDataList, string stageName = "TestStage")
         {
             // 로직 클래스 생성
-            _costSystem = new CostSystem();
-            _combatLog = new CombatLogSystem();
-            _skillExecutor = new SkillExecutor(_costSystem, _combatLog);
-            _combatSystem = new CombatSystem(_costSystem, _combatLog, _skillExecutor);
+            _combatSystem = new CombatSystem();
+            _costSystem = _combatSystem.CostSystem;
+            _combatLog = _combatSystem.CombatLog;
+            _skillExecutor = _combatSystem.SkillExecutor;
 
             // Student 인스턴스 생성
             List<Student> students = new List<Student>();
