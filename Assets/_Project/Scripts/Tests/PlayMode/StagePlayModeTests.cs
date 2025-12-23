@@ -95,7 +95,7 @@ namespace NexonGame.Tests.PlayMode
 
             // Act
             _stageManager.InitializeStage(_testStageData);
-            yield return new WaitForSeconds(0.5f); // 시각화 대기
+            yield return null; // 초기화 완료 대기
 
             // Assert - 이름으로 플랫폼 찾기
             var allObjects = Object.FindObjectsByType<PlatformObject>(FindObjectsSortMode.None);
@@ -111,7 +111,7 @@ namespace NexonGame.Tests.PlayMode
             }
 
             Debug.Log($"✅ [PlayMode Test] {allObjects.Length}개의 플랫폼이 생성됨");
-            yield return new WaitForSeconds(0.5f); // 결과 확인 대기
+            yield return new WaitForSeconds(0.5f); // [시각화용] 결과 관찰 시간
         }
 
         [UnityTest]
@@ -140,7 +140,7 @@ namespace NexonGame.Tests.PlayMode
 
             // Act
             bool moved = _stageManager.MovePlayer(targetPos);
-            yield return new WaitForSeconds(0.1f); // 비주얼 업데이트 대기
+            yield return null; // 1 프레임 대기 (충분함)
 
             // Assert
             Assert.IsTrue(moved, "이동 성공해야 함");
@@ -175,18 +175,20 @@ namespace NexonGame.Tests.PlayMode
 
             // Arrange
             _stageManager.InitializeStage(_testStageData);
-            yield return new WaitForSeconds(1f); // 초기화 확인
+            yield return null;
 
             var path = _stageManager.GetPathToBattle();
             Debug.Log($"경로: {path.Count}칸, 목표: {_testStageData.battlePosition}");
 
-            // Act - 경로를 따라 이동 (천천히)
+            yield return new WaitForSeconds(0.5f); // [시각화용] 초기 상태 관찰
+
+            // Act - 경로를 따라 이동
             foreach (var pos in path)
             {
                 Debug.Log($"이동 중: {_stageManager.PlayerPosition} → {pos}");
                 bool moved = _stageManager.MovePlayer(pos);
                 Assert.IsTrue(moved, $"위치 {pos}로 이동 실패");
-                yield return new WaitForSeconds(0.3f); // 이동 애니메이션 관찰
+                yield return new WaitForSeconds(0.3f); // [시각화용] 이동 과정 관찰
             }
 
             // Assert
@@ -195,7 +197,7 @@ namespace NexonGame.Tests.PlayMode
             Assert.IsTrue(_stageManager.CanEnterBattle(), "전투 진입 가능해야 함");
 
             Debug.Log($"✅ [PlayMode Test] 전투 위치 도착! 총 {_stageManager.TotalMovesInStage}회 이동");
-            yield return new WaitForSeconds(1f); // 결과 확인
+            yield return new WaitForSeconds(0.5f); // [시각화용] 결과 관찰
         }
 
         [UnityTest]
