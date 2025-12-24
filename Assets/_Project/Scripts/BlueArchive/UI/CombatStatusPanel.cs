@@ -272,8 +272,8 @@ namespace NexonGame.BlueArchive.UI
                 if (_damageStatEntries.TryGetValue(kvp.Key, out var entry))
                 {
                     entry.RootObject.SetActive(true);
-                    entry.DamageText.text = $"{kvp.Value:N0} DMG  ";
-                    entry.RootObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, yPos - 12.5f);
+                    entry.DamageText.text = $"{kvp.Value:N0} DMG";
+                    entry.RootObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, yPos);
                 }
                 else
                 {
@@ -282,7 +282,7 @@ namespace NexonGame.BlueArchive.UI
                     _damageStatEntries[kvp.Key] = entry;
                 }
 
-                yPos -= 30;
+                yPos -= 35; // 엔트리 높이(30) + 간격(5)
             }
 
             // 더 이상 사용하지 않는 엔트리 숨기기
@@ -299,59 +299,60 @@ namespace NexonGame.BlueArchive.UI
         }
 
         /// <summary>
-        /// 데미지 통계 엔트리 생성
+        /// 데미지 통계 엔트리 생성 (StudentEntry 구조 참고)
         /// </summary>
         private DamageStatEntry CreateDamageStatEntry(string studentName, int damage, float yPos)
         {
             var entry = new DamageStatEntry();
 
+            // 배경 패널
             var entryObj = new GameObject($"DamageEntry_{studentName}");
             entryObj.transform.SetParent(_damageStatsContent.transform, false);
             var entryRect = entryObj.AddComponent<RectTransform>();
-            entryRect.sizeDelta = new Vector2(UI_WIDTH - 20, 25);
-            entryRect.anchoredPosition = new Vector2(0, yPos - 12.5f);
+            entryRect.sizeDelta = new Vector2(UI_WIDTH - 20, 30);
+            entryRect.anchoredPosition = new Vector2(0, yPos);
 
             var entryBg = entryObj.AddComponent<Image>();
             entryBg.sprite = CreateWhiteSprite();
-            entryBg.color = new Color(0.15f, 0.15f, 0.2f, 1f); // Alpha를 1로 변경 (더 선명하게)
+            entryBg.color = new Color(0.15f, 0.15f, 0.2f, 1f);
             entryBg.raycastTarget = false;
 
-            // 학생 이름
+            entry.RootObject = entryObj;
+
+            // 학생 이름 (StudentEntry의 Name 텍스트와 동일한 방식)
             var nameTextObj = new GameObject("Name");
             nameTextObj.transform.SetParent(entryObj.transform, false);
+
             var nameTextRect = nameTextObj.AddComponent<RectTransform>();
-            nameTextRect.sizeDelta = new Vector2(150, 25);
-            nameTextRect.anchoredPosition = new Vector2(-70, 0);
+            nameTextRect.sizeDelta = new Vector2(200, 25);
+            nameTextRect.anchoredPosition = new Vector2(10, 0); // 왼쪽 여백 10
 
-            var nameText = nameTextObj.AddComponent<Text>();
-            nameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            nameText.fontSize = 14; // 폰트 크기 증가
-            nameText.alignment = TextAnchor.MiddleLeft;
-            nameText.color = new Color(1f, 1f, 1f, 1f); // 완전 불투명 흰색
-            nameText.text = $"  {studentName}";
-            nameText.raycastTarget = false;
+            entry.NameText = nameTextObj.AddComponent<Text>();
+            entry.NameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            entry.NameText.fontSize = 14;
+            entry.NameText.alignment = TextAnchor.MiddleLeft;
+            entry.NameText.color = Color.white;
+            entry.NameText.text = $"  {studentName}";
+            entry.NameText.raycastTarget = false;
 
-            // 데미지
+            // 데미지 (StudentEntry의 HP 텍스트와 동일한 방식)
             var damageTextObj = new GameObject("Damage");
             damageTextObj.transform.SetParent(entryObj.transform, false);
+
             var damageTextRect = damageTextObj.AddComponent<RectTransform>();
             damageTextRect.sizeDelta = new Vector2(100, 25);
-            damageTextRect.anchoredPosition = new Vector2(60, 0);
+            damageTextRect.anchoredPosition = new Vector2(UI_WIDTH - 120, 0); // 오른쪽 정렬
 
-            var damageText = damageTextObj.AddComponent<Text>();
-            damageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            damageText.fontSize = 14; // 폰트 크기 증가
-            damageText.alignment = TextAnchor.MiddleRight;
-            damageText.color = new Color(1f, 0.6f, 0.2f, 1f); // Alpha를 1로 명시
-            damageText.fontStyle = FontStyle.Bold;
-            damageText.text = $"{damage:N0} DMG  ";
-            damageText.raycastTarget = false;
+            entry.DamageText = damageTextObj.AddComponent<Text>();
+            entry.DamageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            entry.DamageText.fontSize = 14;
+            entry.DamageText.alignment = TextAnchor.MiddleRight;
+            entry.DamageText.color = new Color(1f, 0.6f, 0.2f, 1f);
+            entry.DamageText.fontStyle = FontStyle.Bold;
+            entry.DamageText.text = $"{damage:N0} DMG";
+            entry.DamageText.raycastTarget = false;
 
-            Debug.Log($"[CombatStatusPanel] 엔트리 생성: {studentName} - {damage} DMG (위치: {yPos})");
-
-            entry.RootObject = entryObj;
-            entry.NameText = nameText;
-            entry.DamageText = damageText;
+            Debug.Log($"[CombatStatusPanel] 데미지 엔트리 생성: {studentName} - {damage} DMG (Y: {yPos})");
 
             return entry;
         }
