@@ -45,6 +45,7 @@ namespace NexonGame.BlueArchive.Combat
         private CostDisplay _costDisplay;
         private CombatLogPanel _combatLogPanel;
         private CombatStatusPanel _combatStatusPanel;
+        private SkillButtonPanel _skillButtonPanel;
 
         // 프로퍼티
         public CombatSystem CombatSystem => _combatSystem;
@@ -109,6 +110,7 @@ namespace NexonGame.BlueArchive.Combat
 
             // UI 생성
             CreateCostDisplay();
+            CreateSkillButtonPanel(students); // 스킬 버튼 패널 생성 (코스트바 위)
             CreateCombatLogPanel();
             CreateCombatStatusPanel(students);
 
@@ -259,6 +261,22 @@ namespace NexonGame.BlueArchive.Combat
         }
 
         /// <summary>
+        /// 스킬 버튼 패널 생성
+        /// </summary>
+        private void CreateSkillButtonPanel(List<Student> students)
+        {
+            if (_skillButtonPanel != null)
+            {
+                Destroy(_skillButtonPanel.gameObject);
+            }
+
+            var skillButtonPanelObj = new GameObject("SkillButtonPanel");
+            skillButtonPanelObj.transform.SetParent(transform);
+            _skillButtonPanel = skillButtonPanelObj.AddComponent<SkillButtonPanel>();
+            _skillButtonPanel.Initialize(students, this, _costSystem);
+        }
+
+        /// <summary>
         /// 전투 로그 패널 생성
         /// </summary>
         private void CreateCombatLogPanel()
@@ -291,7 +309,7 @@ namespace NexonGame.BlueArchive.Combat
         }
 
         /// <summary>
-        /// 학생 스킬 사용
+        /// 학생 스킬 사용 (UI 버튼 또는 프로그래매틱 호출용)
         /// </summary>
         public SkillExecutionResult UseStudentSkill(int studentIndex)
         {
@@ -324,6 +342,22 @@ namespace NexonGame.BlueArchive.Combat
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 스킬 버튼 클릭 시뮬레이션 (테스트용)
+        /// </summary>
+        public void SimulateSkillButtonClick(int studentIndex)
+        {
+            if (_skillButtonPanel != null)
+            {
+                _skillButtonPanel.SimulateButtonClick(studentIndex);
+            }
+            else
+            {
+                // 버튼 패널이 없으면 직접 스킬 사용
+                UseStudentSkill(studentIndex);
+            }
         }
 
         /// <summary>
@@ -489,6 +523,12 @@ namespace NexonGame.BlueArchive.Combat
             {
                 Destroy(_costDisplay.gameObject);
                 _costDisplay = null;
+            }
+
+            if (_skillButtonPanel != null)
+            {
+                Destroy(_skillButtonPanel.gameObject);
+                _skillButtonPanel = null;
             }
 
             if (_combatLogPanel != null)
