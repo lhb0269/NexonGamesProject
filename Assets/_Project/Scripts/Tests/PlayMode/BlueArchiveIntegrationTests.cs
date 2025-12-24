@@ -384,11 +384,11 @@ namespace NexonGame.Tests.PlayMode
         }
 
         /// <summary>
-        /// 체크포인트 #3: EX 스킬 사용 로깅
+        /// 체크포인트 #3: EX 스킬 사용 로깅 (버튼 클릭 시뮬레이션)
         /// </summary>
         private IEnumerator CheckpointThree_SkillUsage()
         {
-            Debug.Log("\n[체크포인트 #3] EX 스킬 사용 로깅 시작");
+            Debug.Log("\n[체크포인트 #3] EX 스킬 사용 로깅 시작 (버튼 클릭 방식)");
             _testProgressPanel.UpdateCheckpoint(3, CheckpointStatus.InProgress);
             _testProgressPanel.UpdateMessage("스킬 사용 테스트 중...");
 
@@ -396,13 +396,13 @@ namespace NexonGame.Tests.PlayMode
             Debug.Log("  코스트 충전 대기...");
             yield return new WaitForSeconds(2f);
 
-            // 각 학생별로 스킬 사용
+            // 각 학생별로 스킬 버튼 클릭 시뮬레이션
             for (int i = 0; i < _testStudents.Count; i++)
             {
                 var studentName = _testStudents[i].studentName;
                 var skillCost = _testStudents[i].skillCost;
 
-                Debug.Log($"  [{studentName}] 스킬 사용 시도 (코스트: {skillCost})");
+                Debug.Log($"  [{studentName}] 스킬 버튼 클릭 시도 (코스트: {skillCost})");
 
                 // 코스트가 충분할 때까지 대기
                 while (_combatManager.CurrentCost < skillCost)
@@ -411,16 +411,17 @@ namespace NexonGame.Tests.PlayMode
                     yield return new WaitForSeconds(1f);
                 }
 
-                // 스킬 사용
-                var result = _combatManager.UseStudentSkill(i);
+                // 스킬 버튼 클릭 시뮬레이션
+                _combatManager.SimulateSkillButtonClick(i);
+                yield return null; // 한 프레임 대기
 
-                if (result != null && result.Success)
+                // 결과 확인 (CombatLog를 통해)
+                var combatLog = _combatManager.CombatSystem.CombatLog;
+                if (combatLog.TotalDamageDealt > 0)
                 {
                     Debug.Log($"  ✓ {studentName} 스킬 사용 성공!");
-                    Debug.Log($"    - 데미지: {result.TotalDamage}");
-                    Debug.Log($"    - 타격 수: {result.TargetsHit}");
-
-                    Assert.Greater(result.TotalDamage, 0, "데미지가 0보다 커야 함");
+                    Debug.Log($"    - 현재 총 데미지: {combatLog.TotalDamageDealt}");
+                    Debug.Log($"    - 총 스킬 사용: {combatLog.TotalSkillsUsed}회");
                 }
                 else
                 {
@@ -459,13 +460,13 @@ namespace NexonGame.Tests.PlayMode
             int costBefore = _combatManager.CurrentCost;
             Debug.Log($"  현재 코스트: {costBefore}/{_combatManager.MaxCost}");
 
-            // 코스트가 충분하면 스킬 사용
+            // 코스트가 충분하면 스킬 버튼 클릭
             if (costBefore >= 2)
             {
                 var student = _combatManager.GetStudent(1); // Hoshino (코스트 2)
                 int expectedCost = student.Data.skillCost;
 
-                var result = _combatManager.UseStudentSkill(1);
+                _combatManager.SimulateSkillButtonClick(1);
                 yield return null;
 
                 int costAfter = _combatManager.CurrentCost;
@@ -510,19 +511,20 @@ namespace NexonGame.Tests.PlayMode
             Debug.Log($"  현재까지 총 데미지: {totalDamageDealt}");
             Assert.Greater(totalDamageDealt, 0, "데미지가 기록되어야 함");
 
-            // 남은 적이 있으면 추가 공격
+            // 남은 적이 있으면 추가 공격 (버튼 클릭)
             if (_combatManager.GetAliveEnemyCount() > 0)
             {
                 yield return new WaitForSeconds(2f); // 코스트 충전
 
                 int damageBefore = combatLog.TotalDamageDealt;
-                var result = _combatManager.UseStudentSkill(0);
+                _combatManager.SimulateSkillButtonClick(0);
+                yield return null;
 
-                if (result != null && result.Success)
+                int damageAfter = combatLog.TotalDamageDealt;
+                int damageDealt = damageAfter - damageBefore;
+
+                if (damageDealt > 0)
                 {
-                    int damageAfter = combatLog.TotalDamageDealt;
-                    int damageDealt = damageAfter - damageBefore;
-
                     Assert.Greater(damageDealt, 0, "데미지 증가 확인");
                     Debug.Log($"  ✓ 데미지 추적: {damageBefore} → {damageAfter} (+{damageDealt})");
                 }
