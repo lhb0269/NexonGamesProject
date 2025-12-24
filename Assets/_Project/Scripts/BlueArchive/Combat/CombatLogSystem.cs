@@ -124,8 +124,6 @@ namespace NexonGame.BlueArchive.Combat
             }
             _studentDamageStats[actorName] += damage;
 
-            Debug.Log($"[CombatLogSystem] 데미지 기록: {actorName} → {targetName}: {damage} (누적: {_studentDamageStats[actorName]}, 총: {TotalDamageDealt})");
-
             AddLog(CombatLogType.DamageDealt, actorName, $"{actorName} → {targetName}: {damage} 데미지", targetName, damage);
         }
 
@@ -242,7 +240,6 @@ namespace NexonGame.BlueArchive.Combat
             TotalCostSpent = 0;
             _studentDamageStats.Clear();
             _isCombatActive = false;
-            Debug.Log("[CombatLogSystem] 로그 초기화");
         }
 
         /// <summary>

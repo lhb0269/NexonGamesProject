@@ -29,7 +29,6 @@ namespace NexonGame.BlueArchive.UI
         private CombatLogSystem _combatLog;
         private Dictionary<string, DamageStatEntry> _damageStatEntries;
         private int _lastDamageUpdateCount;
-        private float _lastUpdateLogTime;
 
         private const float UI_WIDTH = 350f;
         private const float ENTRY_HEIGHT = 60f;
@@ -94,7 +93,6 @@ namespace NexonGame.BlueArchive.UI
         public void SetCombatLog(CombatLogSystem combatLog)
         {
             _combatLog = combatLog;
-            Debug.Log($"[CombatStatusPanel] CombatLog 설정: {(combatLog != null ? "성공" : "실패 (null)")}");
             CreateDamageStatsPanel();
         }
 
@@ -103,11 +101,8 @@ namespace NexonGame.BlueArchive.UI
         /// </summary>
         private void CreateDamageStatsPanel()
         {
-            Debug.Log("[CombatStatusPanel] CreateDamageStatsPanel 시작");
-
             // 데미지 통계 패널 (학생 상태 아래에 위치)
             _damageStatsPanel = CreatePanel("DamageStatsPanel", new Vector2(UI_WIDTH, DAMAGE_PANEL_HEIGHT), Vector2.zero);
-            Debug.Log($"[CombatStatusPanel] _damageStatsPanel 생성: {_damageStatsPanel != null}");
             var panelRect = _damageStatsPanel.GetComponent<RectTransform>();
             panelRect.anchorMin = new Vector2(1f, 1f);
             panelRect.anchorMax = new Vector2(1f, 1f);
@@ -119,10 +114,8 @@ namespace NexonGame.BlueArchive.UI
 
             var panelBg = _damageStatsPanel.GetComponent<Image>();
             panelBg.sprite = CreateWhiteSprite();
-            panelBg.color = new Color(0.1f, 0.1f, 0.15f, 1f); // Alpha를 1로 변경
-            panelBg.raycastTarget = false; // 레이캐스트 비활성화
-
-            Debug.Log($"[CombatStatusPanel] 패널 배경 색상: {panelBg.color}, 위치: {panelRect.anchoredPosition}");
+            panelBg.color = new Color(0.1f, 0.1f, 0.15f, 1f);
+            panelBg.raycastTarget = false;
 
             // 타이틀
             var titleObj = new GameObject("Title");
@@ -133,16 +126,14 @@ namespace NexonGame.BlueArchive.UI
 
             var titleText = titleObj.AddComponent<Text>();
             titleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            titleText.material = null; // Material을 null로 설정하여 기본 UI Shader 사용
+            titleText.material = null;
             titleText.fontSize = 14;
             titleText.alignment = TextAnchor.MiddleCenter;
-            titleText.color = new Color(1f, 0.9f, 0.3f, 1f); // Alpha를 명시적으로 1로 설정
+            titleText.color = new Color(1f, 0.9f, 0.3f, 1f);
             titleText.fontStyle = FontStyle.Bold;
             titleText.text = "학생별 데미지 통계";
             titleText.raycastTarget = false;
             titleText.maskable = false;
-
-            Debug.Log($"[CombatStatusPanel] 타이틀 텍스트 색상: {titleText.color}, 텍스트: '{titleText.text}'");
 
             // ScrollRect 생성
             _damageStatsScrollRect = _damageStatsPanel.AddComponent<ScrollRect>();
@@ -171,7 +162,6 @@ namespace NexonGame.BlueArchive.UI
             contentRect.sizeDelta = new Vector2(0, 0);
 
             _damageStatsContent = contentObj;
-            Debug.Log($"[CombatStatusPanel] _damageStatsContent 할당: {_damageStatsContent != null}");
 
             // ScrollRect 설정
             _damageStatsScrollRect.content = contentRect;
@@ -179,8 +169,6 @@ namespace NexonGame.BlueArchive.UI
             _damageStatsScrollRect.horizontal = false;
             _damageStatsScrollRect.vertical = true;
             _damageStatsScrollRect.scrollSensitivity = 20f;
-
-            Debug.Log("[CombatStatusPanel] 데미지 통계 패널 생성 완료");
         }
 
         /// <summary>
@@ -188,36 +176,15 @@ namespace NexonGame.BlueArchive.UI
         /// </summary>
         private void UpdateDamageStats()
         {
-            if (_combatLog == null)
-            {
-                Debug.LogWarning("[CombatStatusPanel] UpdateDamageStats: _combatLog가 null입니다!");
+            if (_combatLog == null || _damageStatsContent == null)
                 return;
-            }
-
-            if (_damageStatsContent == null)
-            {
-                Debug.LogWarning("[CombatStatusPanel] UpdateDamageStats: _damageStatsContent가 null입니다!");
-                return;
-            }
 
             var stats = _combatLog.StudentDamageStats;
 
             // 데미지가 변경되지 않았으면 업데이트 하지 않음
             int currentTotalDamage = _combatLog.TotalDamageDealt;
             if (currentTotalDamage == _lastDamageUpdateCount && _damageStatEntries.Count > 0)
-            {
                 return;
-            }
-
-            // 디버그: 데미지 변경 감지
-            if (currentTotalDamage != _lastDamageUpdateCount)
-            {
-                Debug.Log($"[CombatStatusPanel] 데미지 통계 업데이트: {_lastDamageUpdateCount} → {currentTotalDamage}, 학생 수: {stats.Count}");
-                foreach (var kvp in stats)
-                {
-                    Debug.Log($"  - {kvp.Key}: {kvp.Value} DMG");
-                }
-            }
 
             _lastDamageUpdateCount = currentTotalDamage;
 
@@ -240,10 +207,10 @@ namespace NexonGame.BlueArchive.UI
 
                     var noDataText = noDataObj.AddComponent<Text>();
                     noDataText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                    noDataText.material = null; // Material을 null로 설정하여 기본 UI Shader 사용
+                    noDataText.material = null;
                     noDataText.fontSize = 12;
                     noDataText.alignment = TextAnchor.MiddleCenter;
-                    noDataText.color = new Color(0.6f, 0.6f, 0.6f, 1f); // Alpha를 1로 명시
+                    noDataText.color = new Color(0.6f, 0.6f, 0.6f, 1f);
                     noDataText.text = "아직 데미지 기록이 없습니다";
                     noDataText.raycastTarget = false;
                     noDataText.maskable = false;
@@ -333,15 +300,15 @@ namespace NexonGame.BlueArchive.UI
 
             entry.NameText = nameTextObj.AddComponent<Text>();
             entry.NameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            entry.NameText.material = null; // Material을 null로 설정하여 기본 UI Shader 사용
+            entry.NameText.material = null;
             entry.NameText.fontSize = 14;
             entry.NameText.alignment = TextAnchor.MiddleLeft;
             entry.NameText.color = Color.white;
             entry.NameText.text = $"  {studentName}";
             entry.NameText.raycastTarget = false;
-            entry.NameText.maskable = false; // Mask 영향 받지 않음
+            entry.NameText.maskable = false;
 
-            // 데미지 (StudentEntry의 HP 텍스트와 동일한 방식)
+            // 데미지
             var damageTextObj = new GameObject("Damage");
             damageTextObj.transform.SetParent(entryObj.transform, false);
 
@@ -351,16 +318,14 @@ namespace NexonGame.BlueArchive.UI
 
             entry.DamageText = damageTextObj.AddComponent<Text>();
             entry.DamageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            entry.DamageText.material = null; // Material을 null로 설정하여 기본 UI Shader 사용
+            entry.DamageText.material = null;
             entry.DamageText.fontSize = 14;
             entry.DamageText.alignment = TextAnchor.MiddleRight;
             entry.DamageText.color = new Color(1f, 0.6f, 0.2f, 1f);
             entry.DamageText.fontStyle = FontStyle.Bold;
             entry.DamageText.text = $"{damage:N0} DMG";
             entry.DamageText.raycastTarget = false;
-            entry.DamageText.maskable = false; // Mask 영향 받지 않음
-
-            Debug.Log($"[CombatStatusPanel] 데미지 엔트리 생성: {studentName} - {damage} DMG (Y: {yPos})");
+            entry.DamageText.maskable = false;
 
             return entry;
         }
@@ -532,25 +497,8 @@ namespace NexonGame.BlueArchive.UI
         /// </summary>
         private void Update()
         {
-            // 1초마다 Update 호출 확인 로그
-            if (Time.time - _lastUpdateLogTime > 1f)
-            {
-                _lastUpdateLogTime = Time.time;
-                Debug.Log($"[CombatStatusPanel] Update 호출 중 (CombatLog: {_combatLog != null}, Content: {_damageStatsContent != null})");
-            }
-
             UpdateAllStudents();
             UpdateDamageStats();
-        }
-
-        private void OnEnable()
-        {
-            Debug.Log("[CombatStatusPanel] OnEnable 호출됨");
-        }
-
-        private void OnDisable()
-        {
-            Debug.Log("[CombatStatusPanel] OnDisable 호출됨");
         }
 
         /// <summary>
