@@ -140,6 +140,7 @@ namespace NexonGame.BlueArchive.UI
             titleText.fontStyle = FontStyle.Bold;
             titleText.text = "학생별 데미지 통계";
             titleText.raycastTarget = false;
+            titleText.maskable = true;
 
             Debug.Log($"[CombatStatusPanel] 타이틀 텍스트 색상: {titleText.color}, 텍스트: '{titleText.text}'");
 
@@ -245,6 +246,7 @@ namespace NexonGame.BlueArchive.UI
                     noDataText.color = new Color(0.6f, 0.6f, 0.6f, 1f); // Alpha를 1로 명시
                     noDataText.text = "아직 데미지 기록이 없습니다";
                     noDataText.raycastTarget = false;
+                    noDataText.maskable = true;
                 }
 
                 _damageStatsContent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 30);
@@ -337,6 +339,7 @@ namespace NexonGame.BlueArchive.UI
             entry.NameText.color = Color.white;
             entry.NameText.text = $"  {studentName}";
             entry.NameText.raycastTarget = false;
+            entry.NameText.maskable = true; // ScrollRect Mask 지원
 
             // 데미지 (StudentEntry의 HP 텍스트와 동일한 방식)
             var damageTextObj = new GameObject("Damage");
@@ -355,6 +358,7 @@ namespace NexonGame.BlueArchive.UI
             entry.DamageText.fontStyle = FontStyle.Bold;
             entry.DamageText.text = $"{damage:N0} DMG";
             entry.DamageText.raycastTarget = false;
+            entry.DamageText.maskable = true; // ScrollRect Mask 지원
 
             Debug.Log($"[CombatStatusPanel] 데미지 엔트리 생성: {studentName} - {damage} DMG (Y: {yPos})");
 
