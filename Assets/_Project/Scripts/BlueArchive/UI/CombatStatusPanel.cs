@@ -184,6 +184,17 @@ namespace NexonGame.BlueArchive.UI
             {
                 return;
             }
+
+            // 디버그: 데미지 변경 감지
+            if (currentTotalDamage != _lastDamageUpdateCount)
+            {
+                Debug.Log($"[CombatStatusPanel] 데미지 통계 업데이트: {_lastDamageUpdateCount} → {currentTotalDamage}, 학생 수: {stats.Count}");
+                foreach (var kvp in stats)
+                {
+                    Debug.Log($"  - {kvp.Key}: {kvp.Value} DMG");
+                }
+            }
+
             _lastDamageUpdateCount = currentTotalDamage;
 
             if (stats.Count == 0)
