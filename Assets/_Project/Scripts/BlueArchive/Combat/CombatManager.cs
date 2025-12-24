@@ -287,6 +287,7 @@ namespace NexonGame.BlueArchive.Combat
             statusPanelObj.transform.SetParent(transform);
             _combatStatusPanel = statusPanelObj.AddComponent<CombatStatusPanel>();
             _combatStatusPanel.InitializeStudents(students);
+            _combatStatusPanel.SetCombatLog(_combatSystem.CombatLog); // 데미지 통계용
         }
 
         /// <summary>

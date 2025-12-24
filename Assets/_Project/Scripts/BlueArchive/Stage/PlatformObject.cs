@@ -77,10 +77,18 @@ namespace NexonGame.BlueArchive.Stage
         {
             if (_renderer != null)
             {
-                // MaterialPropertyBlock 사용으로 Material 인스턴스 생성 방지
+                // URP에서는 _BaseColor 사용
+                // MaterialPropertyBlock과 Material 모두 시도
                 _renderer.GetPropertyBlock(_propertyBlock);
-                _propertyBlock.SetColor("_Color", color);
+                _propertyBlock.SetColor("_BaseColor", color);
+                _propertyBlock.SetColor("_Color", color); // Fallback for built-in
                 _renderer.SetPropertyBlock(_propertyBlock);
+
+                // Material도 직접 설정 (런타임에서 인스턴스 생성)
+                if (_renderer.material != null)
+                {
+                    _renderer.material.color = color;
+                }
             }
         }
 

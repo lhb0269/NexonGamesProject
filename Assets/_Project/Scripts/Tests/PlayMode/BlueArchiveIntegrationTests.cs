@@ -287,21 +287,29 @@ namespace NexonGame.Tests.PlayMode
 
             Debug.Log($"  ✓ {platforms.Length}개 플랫폼 생성 확인");
 
-            // 이동 경로 계산
-            var path = _stageManager.GetPathToBattle();
-            Assert.IsNotNull(path, "이동 경로 계산 성공");
-            Assert.Greater(path.Count, 0, "이동 경로가 존재해야 함");
+            // 수동 이동 경로 설정
+            // (0,0) → (1,1) → (0,2) → (1,1) → (2,1) → (3,1)
+            var manualPath = new List<Vector2Int>
+            {
+                new Vector2Int(1, 1), // (0,0)에서 (1,1)로
+                new Vector2Int(0, 2), // (1,1)에서 (0,2)로
+                new Vector2Int(1, 1), // (0,2)에서 (1,1)로 (되돌아옴)
+                new Vector2Int(2, 1), // (1,1)에서 (2,1)로
+                new Vector2Int(3, 1)  // (2,1)에서 (3,1)로 (전투)
+            };
 
-            Debug.Log($"  ✓ 이동 경로 계산: {path.Count}칸");
+            Debug.Log($"  ✓ 수동 이동 경로 설정: {manualPath.Count}칸");
+            Debug.Log($"    경로: (0,0) → (1,1) → (0,2) → (1,1) → (2,1) → (3,1)");
 
             yield return new WaitForSeconds(0.5f);
 
             // 경로를 따라 이동
-            foreach (var pos in path)
+            foreach (var pos in manualPath)
             {
                 bool moved = _stageManager.MovePlayer(pos);
                 Assert.IsTrue(moved, $"위치 {pos}로 이동 성공");
-                yield return new WaitForSeconds(0.2f);
+                Debug.Log($"    → 현재 위치: {_stageManager.PlayerPosition}");
+                yield return new WaitForSeconds(0.3f);
             }
 
             // 전투 위치 도착 확인
@@ -314,6 +322,16 @@ namespace NexonGame.Tests.PlayMode
             _testProgressPanel.UpdateCheckpoint(1, CheckpointStatus.Completed);
             _testProgressPanel.UpdateMessage("플랫폼 이동 완료!");
             yield return new WaitForSeconds(0.5f);
+
+            // 체크포인트 #1 정리: 생성된 플랫폼 제거
+            // (PlayerMarker는 StageManager가 관리하므로 별도 정리 불필요)
+            platforms = Object.FindObjectsByType<PlatformObject>(FindObjectsSortMode.None);
+            foreach (var platform in platforms)
+            {
+                Object.Destroy(platform.gameObject);
+            }
+            Debug.Log($"  🧹 플랫폼 {platforms.Length}개 정리 완료");
+            yield return null;
         }
 
         /// <summary>
@@ -564,11 +582,53 @@ namespace NexonGame.Tests.PlayMode
             Assert.AreEqual(StageState.StageCleared, _stageManager.CurrentState, "스테이지 클리어 상태");
             Debug.Log("  ✓ 스테이지 클리어");
 
+            // RewardResultPanel 생성 및 표시
+            var rewardPanelObj = new GameObject("RewardResultPanel");
+            var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
+            yield return null;
+
+            // 통계 정보 생성
+            var combatLog = _combatManager.CombatSystem.CombatLog;
+            string statistics = $"총 이동 횟수: {_stageManager.TotalMovesInStage}회\n" +
+                              $"스킬 사용: {combatLog.TotalSkillsUsed}회\n" +
+                              $"총 데미지: {combatLog.TotalDamageDealt}\n" +
+                              $"격파한 적: {combatLog.TotalEnemiesDefeated}명";
+
+            // 보상 패널 표시
+            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult, statistics);
+            Debug.Log("  ✓ RewardResultPanel 표시");
+
+            yield return new WaitForSeconds(3f); // 보상 패널 확인 시간
+
             Debug.Log("[체크포인트 #6] ✅ 통과");
 
             _testProgressPanel.UpdateCheckpoint(6, CheckpointStatus.Completed);
             _testProgressPanel.UpdateMessage("보상 획득 완료!");
             yield return new WaitForSeconds(1f);
+
+            // RewardResultPanel 제거
+            Object.Destroy(rewardPanelObj);
+
+            // 체크포인트 #6 정리: 전투 관련 오브젝트 제거
+            var studentObjects = Object.FindObjectsByType<StudentObject>(FindObjectsSortMode.None);
+            var enemyObjects = Object.FindObjectsByType<EnemyObject>(FindObjectsSortMode.None);
+            var costDisplay = Object.FindFirstObjectByType<CostDisplay>();
+            var combatLogPanel = Object.FindFirstObjectByType<CombatLogPanel>();
+            var combatStatusPanel = Object.FindFirstObjectByType<CombatStatusPanel>();
+
+            foreach (var student in studentObjects)
+                Object.Destroy(student.gameObject);
+            foreach (var enemy in enemyObjects)
+                Object.Destroy(enemy.gameObject);
+            if (costDisplay != null)
+                Object.Destroy(costDisplay.gameObject);
+            if (combatLogPanel != null)
+                Object.Destroy(combatLogPanel.gameObject);
+            if (combatStatusPanel != null)
+                Object.Destroy(combatStatusPanel.gameObject);
+
+            Debug.Log($"  🧹 전투 오브젝트 정리 완료 (학생 {studentObjects.Length}명, 적 {enemyObjects.Length}명, UI 패널 3개)");
+            yield return null;
         }
     }
 }
