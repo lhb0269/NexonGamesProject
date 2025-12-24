@@ -327,7 +327,7 @@ namespace NexonGame.BlueArchive.UI
 
             var nameTextRect = nameTextObj.AddComponent<RectTransform>();
             nameTextRect.sizeDelta = new Vector2(200, 25);
-            nameTextRect.anchoredPosition = new Vector2(10, 0); // 왼쪽 여백 10
+            nameTextRect.anchoredPosition = new Vector2(-60, 0);
 
             entry.NameText = nameTextObj.AddComponent<Text>();
             entry.NameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
