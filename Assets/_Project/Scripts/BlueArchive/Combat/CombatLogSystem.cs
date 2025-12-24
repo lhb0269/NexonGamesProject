@@ -69,6 +69,10 @@ namespace NexonGame.BlueArchive.Combat
         public int TotalEnemiesDefeated { get; private set; }
         public int TotalCostSpent { get; private set; }
 
+        // 학생별 통계 (학생 이름 → 데미지)
+        private Dictionary<string, int> _studentDamageStats = new Dictionary<string, int>();
+        public IReadOnlyDictionary<string, int> StudentDamageStats => _studentDamageStats;
+
         // 로그 접근
         public IReadOnlyList<CombatLogEntry> Logs => _logs;
         public int LogCount => _logs.Count;
@@ -112,6 +116,14 @@ namespace NexonGame.BlueArchive.Combat
         public void LogDamageDealt(string actorName, string targetName, int damage)
         {
             TotalDamageDealt += damage;
+
+            // 학생별 데미지 통계 업데이트
+            if (!_studentDamageStats.ContainsKey(actorName))
+            {
+                _studentDamageStats[actorName] = 0;
+            }
+            _studentDamageStats[actorName] += damage;
+
             AddLog(CombatLogType.DamageDealt, actorName, $"{actorName} → {targetName}: {damage} 데미지", targetName, damage);
         }
 
@@ -226,6 +238,7 @@ namespace NexonGame.BlueArchive.Combat
             TotalSkillsUsed = 0;
             TotalEnemiesDefeated = 0;
             TotalCostSpent = 0;
+            _studentDamageStats.Clear();
             _isCombatActive = false;
             Debug.Log("[CombatLogSystem] 로그 초기화");
         }
