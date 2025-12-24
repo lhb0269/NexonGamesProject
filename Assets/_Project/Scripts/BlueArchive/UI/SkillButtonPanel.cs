@@ -88,10 +88,11 @@ namespace NexonGame.BlueArchive.UI
             float startX = -totalWidth / 2f + (BUTTON_WIDTH / 2f);
             float xPos = startX + index * (BUTTON_WIDTH + BUTTON_SPACING);
 
+            // X 좌표 700 (750 - 50), Y 좌표에 165 추가
             rectTransform.anchorMin = new Vector2(0.5f, 0f);
             rectTransform.anchorMax = new Vector2(0.5f, 0f);
             rectTransform.pivot = new Vector2(0.5f, 0f);
-            rectTransform.anchoredPosition = new Vector2(xPos, PANEL_Y_OFFSET);
+            rectTransform.anchoredPosition = new Vector2(xPos + 650f, PANEL_Y_OFFSET + 165f);
             rectTransform.sizeDelta = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
 
             // StudentSkillButton 컴포넌트 추가
