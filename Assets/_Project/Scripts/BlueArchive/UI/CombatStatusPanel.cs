@@ -133,6 +133,7 @@ namespace NexonGame.BlueArchive.UI
 
             var titleText = titleObj.AddComponent<Text>();
             titleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            titleText.material = null; // Material을 null로 설정하여 기본 UI Shader 사용
             titleText.fontSize = 14;
             titleText.alignment = TextAnchor.MiddleCenter;
             titleText.color = new Color(1f, 0.9f, 0.3f, 1f); // Alpha를 명시적으로 1로 설정
@@ -238,6 +239,7 @@ namespace NexonGame.BlueArchive.UI
 
                     var noDataText = noDataObj.AddComponent<Text>();
                     noDataText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                    noDataText.material = null; // Material을 null로 설정하여 기본 UI Shader 사용
                     noDataText.fontSize = 12;
                     noDataText.alignment = TextAnchor.MiddleCenter;
                     noDataText.color = new Color(0.6f, 0.6f, 0.6f, 1f); // Alpha를 1로 명시
@@ -329,6 +331,7 @@ namespace NexonGame.BlueArchive.UI
 
             entry.NameText = nameTextObj.AddComponent<Text>();
             entry.NameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            entry.NameText.material = null; // Material을 null로 설정하여 기본 UI Shader 사용
             entry.NameText.fontSize = 14;
             entry.NameText.alignment = TextAnchor.MiddleLeft;
             entry.NameText.color = Color.white;
@@ -345,6 +348,7 @@ namespace NexonGame.BlueArchive.UI
 
             entry.DamageText = damageTextObj.AddComponent<Text>();
             entry.DamageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            entry.DamageText.material = null; // Material을 null로 설정하여 기본 UI Shader 사용
             entry.DamageText.fontSize = 14;
             entry.DamageText.alignment = TextAnchor.MiddleRight;
             entry.DamageText.color = new Color(1f, 0.6f, 0.2f, 1f);
