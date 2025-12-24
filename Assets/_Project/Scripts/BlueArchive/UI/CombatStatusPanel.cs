@@ -103,8 +103,11 @@ namespace NexonGame.BlueArchive.UI
         /// </summary>
         private void CreateDamageStatsPanel()
         {
+            Debug.Log("[CombatStatusPanel] CreateDamageStatsPanel 시작");
+
             // 데미지 통계 패널 (학생 상태 아래에 위치)
             _damageStatsPanel = CreatePanel("DamageStatsPanel", new Vector2(UI_WIDTH, DAMAGE_PANEL_HEIGHT), Vector2.zero);
+            Debug.Log($"[CombatStatusPanel] _damageStatsPanel 생성: {_damageStatsPanel != null}");
             var panelRect = _damageStatsPanel.GetComponent<RectTransform>();
             panelRect.anchorMin = new Vector2(1f, 1f);
             panelRect.anchorMax = new Vector2(1f, 1f);
@@ -160,6 +163,7 @@ namespace NexonGame.BlueArchive.UI
             contentRect.sizeDelta = new Vector2(0, 0);
 
             _damageStatsContent = contentObj;
+            Debug.Log($"[CombatStatusPanel] _damageStatsContent 할당: {_damageStatsContent != null}");
 
             // ScrollRect 설정
             _damageStatsScrollRect.content = contentRect;
@@ -168,7 +172,7 @@ namespace NexonGame.BlueArchive.UI
             _damageStatsScrollRect.vertical = true;
             _damageStatsScrollRect.scrollSensitivity = 20f;
 
-            Debug.Log("[CombatStatusPanel] 데미지 통계 패널 생성");
+            Debug.Log("[CombatStatusPanel] 데미지 통계 패널 생성 완료");
         }
 
         /// <summary>
