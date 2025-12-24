@@ -93,6 +93,7 @@ namespace NexonGame.BlueArchive.UI
         public void SetCombatLog(CombatLogSystem combatLog)
         {
             _combatLog = combatLog;
+            Debug.Log($"[CombatStatusPanel] CombatLog 설정: {(combatLog != null ? "성공" : "실패 (null)")}");
             CreateDamageStatsPanel();
         }
 
@@ -174,7 +175,17 @@ namespace NexonGame.BlueArchive.UI
         /// </summary>
         private void UpdateDamageStats()
         {
-            if (_combatLog == null || _damageStatsContent == null) return;
+            if (_combatLog == null)
+            {
+                Debug.LogWarning("[CombatStatusPanel] UpdateDamageStats: _combatLog가 null입니다!");
+                return;
+            }
+
+            if (_damageStatsContent == null)
+            {
+                Debug.LogWarning("[CombatStatusPanel] UpdateDamageStats: _damageStatsContent가 null입니다!");
+                return;
+            }
 
             var stats = _combatLog.StudentDamageStats;
 
