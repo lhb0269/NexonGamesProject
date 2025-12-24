@@ -344,7 +344,7 @@ namespace NexonGame.BlueArchive.UI
 
             var damageTextRect = damageTextObj.AddComponent<RectTransform>();
             damageTextRect.sizeDelta = new Vector2(100, 25);
-            damageTextRect.anchoredPosition = new Vector2(UI_WIDTH - 120, 0); // 오른쪽 정렬
+            damageTextRect.anchoredPosition = new Vector2(120, 0);
 
             entry.DamageText = damageTextObj.AddComponent<Text>();
             entry.DamageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
