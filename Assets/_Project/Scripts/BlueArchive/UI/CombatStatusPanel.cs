@@ -119,7 +119,10 @@ namespace NexonGame.BlueArchive.UI
 
             var panelBg = _damageStatsPanel.GetComponent<Image>();
             panelBg.sprite = CreateWhiteSprite();
-            panelBg.color = new Color(0.1f, 0.1f, 0.15f, 0.9f);
+            panelBg.color = new Color(0.1f, 0.1f, 0.15f, 1f); // Alpha를 1로 변경
+            panelBg.raycastTarget = false; // 레이캐스트 비활성화
+
+            Debug.Log($"[CombatStatusPanel] 패널 배경 색상: {panelBg.color}, 위치: {panelRect.anchoredPosition}");
 
             // 타이틀
             var titleObj = new GameObject("Title");
@@ -132,9 +135,12 @@ namespace NexonGame.BlueArchive.UI
             titleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             titleText.fontSize = 14;
             titleText.alignment = TextAnchor.MiddleCenter;
-            titleText.color = new Color(1f, 0.9f, 0.3f);
+            titleText.color = new Color(1f, 0.9f, 0.3f, 1f); // Alpha를 명시적으로 1로 설정
             titleText.fontStyle = FontStyle.Bold;
             titleText.text = "학생별 데미지 통계";
+            titleText.raycastTarget = false;
+
+            Debug.Log($"[CombatStatusPanel] 타이틀 텍스트 색상: {titleText.color}, 텍스트: '{titleText.text}'");
 
             // ScrollRect 생성
             _damageStatsScrollRect = _damageStatsPanel.AddComponent<ScrollRect>();
@@ -234,8 +240,9 @@ namespace NexonGame.BlueArchive.UI
                     noDataText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
                     noDataText.fontSize = 12;
                     noDataText.alignment = TextAnchor.MiddleCenter;
-                    noDataText.color = new Color(0.6f, 0.6f, 0.6f);
+                    noDataText.color = new Color(0.6f, 0.6f, 0.6f, 1f); // Alpha를 1로 명시
                     noDataText.text = "아직 데미지 기록이 없습니다";
+                    noDataText.raycastTarget = false;
                 }
 
                 _damageStatsContent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 30);
@@ -306,7 +313,8 @@ namespace NexonGame.BlueArchive.UI
 
             var entryBg = entryObj.AddComponent<Image>();
             entryBg.sprite = CreateWhiteSprite();
-            entryBg.color = new Color(0.15f, 0.15f, 0.2f, 0.8f);
+            entryBg.color = new Color(0.15f, 0.15f, 0.2f, 1f); // Alpha를 1로 변경 (더 선명하게)
+            entryBg.raycastTarget = false;
 
             // 학생 이름
             var nameTextObj = new GameObject("Name");
@@ -317,10 +325,11 @@ namespace NexonGame.BlueArchive.UI
 
             var nameText = nameTextObj.AddComponent<Text>();
             nameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            nameText.fontSize = 12;
+            nameText.fontSize = 14; // 폰트 크기 증가
             nameText.alignment = TextAnchor.MiddleLeft;
-            nameText.color = Color.white;
+            nameText.color = new Color(1f, 1f, 1f, 1f); // 완전 불투명 흰색
             nameText.text = $"  {studentName}";
+            nameText.raycastTarget = false;
 
             // 데미지
             var damageTextObj = new GameObject("Damage");
@@ -331,11 +340,14 @@ namespace NexonGame.BlueArchive.UI
 
             var damageText = damageTextObj.AddComponent<Text>();
             damageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            damageText.fontSize = 12;
+            damageText.fontSize = 14; // 폰트 크기 증가
             damageText.alignment = TextAnchor.MiddleRight;
-            damageText.color = new Color(1f, 0.6f, 0.2f);
+            damageText.color = new Color(1f, 0.6f, 0.2f, 1f); // Alpha를 1로 명시
             damageText.fontStyle = FontStyle.Bold;
             damageText.text = $"{damage:N0} DMG  ";
+            damageText.raycastTarget = false;
+
+            Debug.Log($"[CombatStatusPanel] 엔트리 생성: {studentName} - {damage} DMG (위치: {yPos})");
 
             entry.RootObject = entryObj;
             entry.NameText = nameText;
