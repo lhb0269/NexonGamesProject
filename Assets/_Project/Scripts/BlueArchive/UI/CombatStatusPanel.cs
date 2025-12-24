@@ -29,6 +29,7 @@ namespace NexonGame.BlueArchive.UI
         private CombatLogSystem _combatLog;
         private Dictionary<string, DamageStatEntry> _damageStatEntries;
         private int _lastDamageUpdateCount;
+        private float _lastUpdateLogTime;
 
         private const float UI_WIDTH = 350f;
         private const float ENTRY_HEIGHT = 60f;
@@ -506,8 +507,25 @@ namespace NexonGame.BlueArchive.UI
         /// </summary>
         private void Update()
         {
+            // 1초마다 Update 호출 확인 로그
+            if (Time.time - _lastUpdateLogTime > 1f)
+            {
+                _lastUpdateLogTime = Time.time;
+                Debug.Log($"[CombatStatusPanel] Update 호출 중 (CombatLog: {_combatLog != null}, Content: {_damageStatsContent != null})");
+            }
+
             UpdateAllStudents();
             UpdateDamageStats();
+        }
+
+        private void OnEnable()
+        {
+            Debug.Log("[CombatStatusPanel] OnEnable 호출됨");
+        }
+
+        private void OnDisable()
+        {
+            Debug.Log("[CombatStatusPanel] OnDisable 호출됨");
         }
 
         /// <summary>
