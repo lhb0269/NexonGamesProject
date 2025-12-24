@@ -27,6 +27,8 @@ namespace NexonGame.BlueArchive.UI
         private GameObject _damageStatsContent;
         private ScrollRect _damageStatsScrollRect;
         private CombatLogSystem _combatLog;
+        private Dictionary<string, DamageStatEntry> _damageStatEntries;
+        private int _lastDamageUpdateCount;
 
         private const float UI_WIDTH = 350f;
         private const float ENTRY_HEIGHT = 60f;
@@ -36,6 +38,8 @@ namespace NexonGame.BlueArchive.UI
         private void Awake()
         {
             _studentEntries = new List<StudentStatusEntry>();
+            _damageStatEntries = new Dictionary<string, DamageStatEntry>();
+            _lastDamageUpdateCount = 0;
             CreateUIElements();
         }
 
@@ -172,85 +176,145 @@ namespace NexonGame.BlueArchive.UI
         {
             if (_combatLog == null || _damageStatsContent == null) return;
 
-            // 기존 엔트리 제거
-            foreach (Transform child in _damageStatsContent.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
             var stats = _combatLog.StudentDamageStats;
+
+            // 데미지가 변경되지 않았으면 업데이트 하지 않음
+            int currentTotalDamage = _combatLog.TotalDamageDealt;
+            if (currentTotalDamage == _lastDamageUpdateCount && _damageStatEntries.Count > 0)
+            {
+                return;
+            }
+            _lastDamageUpdateCount = currentTotalDamage;
+
             if (stats.Count == 0)
             {
-                // 데이터 없음 메시지
-                var noDataObj = new GameObject("NoData");
-                noDataObj.transform.SetParent(_damageStatsContent.transform, false);
-                var noDataRect = noDataObj.AddComponent<RectTransform>();
-                noDataRect.sizeDelta = new Vector2(UI_WIDTH - 20, 30);
-                noDataRect.anchoredPosition = new Vector2(0, -15);
+                // 모든 엔트리 숨기기
+                foreach (var entry in _damageStatEntries.Values)
+                {
+                    entry.RootObject.SetActive(false);
+                }
 
-                var noDataText = noDataObj.AddComponent<Text>();
-                noDataText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                noDataText.fontSize = 12;
-                noDataText.alignment = TextAnchor.MiddleCenter;
-                noDataText.color = new Color(0.6f, 0.6f, 0.6f);
-                noDataText.text = "아직 데미지 기록이 없습니다";
+                // "아직 데이터가 없습니다" 메시지는 첫 생성시에만 표시
+                if (_damageStatsContent.transform.childCount == 0)
+                {
+                    var noDataObj = new GameObject("NoData");
+                    noDataObj.transform.SetParent(_damageStatsContent.transform, false);
+                    var noDataRect = noDataObj.AddComponent<RectTransform>();
+                    noDataRect.sizeDelta = new Vector2(UI_WIDTH - 20, 30);
+                    noDataRect.anchoredPosition = new Vector2(0, -15);
+
+                    var noDataText = noDataObj.AddComponent<Text>();
+                    noDataText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                    noDataText.fontSize = 12;
+                    noDataText.alignment = TextAnchor.MiddleCenter;
+                    noDataText.color = new Color(0.6f, 0.6f, 0.6f);
+                    noDataText.text = "아직 데미지 기록이 없습니다";
+                }
 
                 _damageStatsContent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 30);
                 return;
+            }
+
+            // "아직 데이터가 없습니다" 메시지 제거
+            var noDataMsg = _damageStatsContent.transform.Find("NoData");
+            if (noDataMsg != null)
+            {
+                Destroy(noDataMsg.gameObject);
             }
 
             // 데미지 순으로 정렬
             var sortedStats = new List<KeyValuePair<string, int>>(stats);
             sortedStats.Sort((a, b) => b.Value.CompareTo(a.Value));
 
-            // 각 학생별 데미지 엔트리 생성
+            // 각 학생별 데미지 엔트리 업데이트 또는 생성
             float yPos = 0;
+            var processedStudents = new HashSet<string>();
+
             foreach (var kvp in sortedStats)
             {
-                var entryObj = new GameObject($"DamageEntry_{kvp.Key}");
-                entryObj.transform.SetParent(_damageStatsContent.transform, false);
-                var entryRect = entryObj.AddComponent<RectTransform>();
-                entryRect.sizeDelta = new Vector2(UI_WIDTH - 20, 25);
-                entryRect.anchoredPosition = new Vector2(0, yPos - 12.5f);
+                processedStudents.Add(kvp.Key);
 
-                var entryBg = entryObj.AddComponent<Image>();
-                entryBg.sprite = CreateWhiteSprite();
-                entryBg.color = new Color(0.15f, 0.15f, 0.2f, 0.8f);
-
-                // 학생 이름
-                var nameTextObj = new GameObject("Name");
-                nameTextObj.transform.SetParent(entryObj.transform, false);
-                var nameTextRect = nameTextObj.AddComponent<RectTransform>();
-                nameTextRect.sizeDelta = new Vector2(150, 25);
-                nameTextRect.anchoredPosition = new Vector2(-70, 0);
-
-                var nameText = nameTextObj.AddComponent<Text>();
-                nameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                nameText.fontSize = 12;
-                nameText.alignment = TextAnchor.MiddleLeft;
-                nameText.color = Color.white;
-                nameText.text = $"  {kvp.Key}";
-
-                // 데미지
-                var damageTextObj = new GameObject("Damage");
-                damageTextObj.transform.SetParent(entryObj.transform, false);
-                var damageTextRect = damageTextObj.AddComponent<RectTransform>();
-                damageTextRect.sizeDelta = new Vector2(100, 25);
-                damageTextRect.anchoredPosition = new Vector2(60, 0);
-
-                var damageText = damageTextObj.AddComponent<Text>();
-                damageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                damageText.fontSize = 12;
-                damageText.alignment = TextAnchor.MiddleRight;
-                damageText.color = new Color(1f, 0.6f, 0.2f);
-                damageText.fontStyle = FontStyle.Bold;
-                damageText.text = $"{kvp.Value:N0} DMG  ";
+                // 기존 엔트리가 있으면 재사용
+                if (_damageStatEntries.TryGetValue(kvp.Key, out var entry))
+                {
+                    entry.RootObject.SetActive(true);
+                    entry.DamageText.text = $"{kvp.Value:N0} DMG  ";
+                    entry.RootObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, yPos - 12.5f);
+                }
+                else
+                {
+                    // 새 엔트리 생성
+                    entry = CreateDamageStatEntry(kvp.Key, kvp.Value, yPos);
+                    _damageStatEntries[kvp.Key] = entry;
+                }
 
                 yPos -= 30;
             }
 
+            // 더 이상 사용하지 않는 엔트리 숨기기
+            foreach (var kvp in _damageStatEntries)
+            {
+                if (!processedStudents.Contains(kvp.Key))
+                {
+                    kvp.Value.RootObject.SetActive(false);
+                }
+            }
+
             // Content 높이 조정
             _damageStatsContent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, Mathf.Abs(yPos));
+        }
+
+        /// <summary>
+        /// 데미지 통계 엔트리 생성
+        /// </summary>
+        private DamageStatEntry CreateDamageStatEntry(string studentName, int damage, float yPos)
+        {
+            var entry = new DamageStatEntry();
+
+            var entryObj = new GameObject($"DamageEntry_{studentName}");
+            entryObj.transform.SetParent(_damageStatsContent.transform, false);
+            var entryRect = entryObj.AddComponent<RectTransform>();
+            entryRect.sizeDelta = new Vector2(UI_WIDTH - 20, 25);
+            entryRect.anchoredPosition = new Vector2(0, yPos - 12.5f);
+
+            var entryBg = entryObj.AddComponent<Image>();
+            entryBg.sprite = CreateWhiteSprite();
+            entryBg.color = new Color(0.15f, 0.15f, 0.2f, 0.8f);
+
+            // 학생 이름
+            var nameTextObj = new GameObject("Name");
+            nameTextObj.transform.SetParent(entryObj.transform, false);
+            var nameTextRect = nameTextObj.AddComponent<RectTransform>();
+            nameTextRect.sizeDelta = new Vector2(150, 25);
+            nameTextRect.anchoredPosition = new Vector2(-70, 0);
+
+            var nameText = nameTextObj.AddComponent<Text>();
+            nameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            nameText.fontSize = 12;
+            nameText.alignment = TextAnchor.MiddleLeft;
+            nameText.color = Color.white;
+            nameText.text = $"  {studentName}";
+
+            // 데미지
+            var damageTextObj = new GameObject("Damage");
+            damageTextObj.transform.SetParent(entryObj.transform, false);
+            var damageTextRect = damageTextObj.AddComponent<RectTransform>();
+            damageTextRect.sizeDelta = new Vector2(100, 25);
+            damageTextRect.anchoredPosition = new Vector2(60, 0);
+
+            var damageText = damageTextObj.AddComponent<Text>();
+            damageText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            damageText.fontSize = 12;
+            damageText.alignment = TextAnchor.MiddleRight;
+            damageText.color = new Color(1f, 0.6f, 0.2f);
+            damageText.fontStyle = FontStyle.Bold;
+            damageText.text = $"{damage:N0} DMG  ";
+
+            entry.RootObject = entryObj;
+            entry.NameText = nameText;
+            entry.DamageText = damageText;
+
+            return entry;
         }
 
         /// <summary>
@@ -475,6 +539,16 @@ namespace NexonGame.BlueArchive.UI
             public Image HPFillImage;
             public Text HPText;
             public Text SkillText;
+        }
+
+        /// <summary>
+        /// 데미지 통계 엔트리
+        /// </summary>
+        private class DamageStatEntry
+        {
+            public GameObject RootObject;
+            public Text NameText;
+            public Text DamageText;
         }
     }
 }
