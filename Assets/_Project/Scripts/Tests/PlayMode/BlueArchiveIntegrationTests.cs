@@ -214,13 +214,13 @@ namespace NexonGame.Tests.PlayMode
         }
 
         /// <summary>
-        /// 6개 체크포인트 전체 통합 테스트
+        /// 5개 체크포인트 전체 통합 테스트
         /// </summary>
         [UnityTest]
-        public IEnumerator FullIntegration_AllSixCheckpoints_ShouldPass()
+        public IEnumerator FullIntegration_AllFiveCheckpoints_ShouldPass()
         {
             Debug.Log("=====================================");
-            Debug.Log("6개 체크포인트 전체 통합 테스트 시작");
+            Debug.Log("5개 체크포인트 전체 통합 테스트 시작");
             Debug.Log("=====================================");
 
             _testProgressPanel.UpdateMessage("테스트 시작...");
@@ -237,24 +237,19 @@ namespace NexonGame.Tests.PlayMode
             yield return CheckpointTwo_BattleEntry();
 
             // ========================================
-            // 체크포인트 #3: EX 스킬 사용 로깅
+            // 체크포인트 #3: EX 스킬 사용 로깅 (코스트 소모 포함)
             // ========================================
             yield return CheckpointThree_SkillUsage();
 
             // ========================================
-            // 체크포인트 #4: 코스트 소모 검증
+            // 체크포인트 #4: 전투별 데미지 추적
             // ========================================
-            yield return CheckpointFour_CostConsumption();
+            yield return CheckpointFour_DamageTracking();
 
             // ========================================
-            // 체크포인트 #5: 전투별 데미지 추적
+            // 체크포인트 #5: 보상 획득 검증
             // ========================================
-            yield return CheckpointFive_DamageTracking();
-
-            // ========================================
-            // 체크포인트 #6: 보상 획득 검증
-            // ========================================
-            yield return CheckpointSix_RewardVerification();
+            yield return CheckpointFive_RewardVerification();
 
             // ========================================
             // 최종 결과
@@ -446,63 +441,12 @@ namespace NexonGame.Tests.PlayMode
         }
 
         /// <summary>
-        /// 체크포인트 #4: 코스트 소모 검증
+        /// 체크포인트 #4: 전투별 데미지 추적
         /// </summary>
-        private IEnumerator CheckpointFour_CostConsumption()
+        private IEnumerator CheckpointFour_DamageTracking()
         {
-            Debug.Log("\n[체크포인트 #4] 코스트 소모 검증 시작");
+            Debug.Log("\n[체크포인트 #4] 전투별 데미지 추적 시작");
             _testProgressPanel.UpdateCheckpoint(4, CheckpointStatus.InProgress);
-            _testProgressPanel.UpdateMessage("코스트 소모 검증 중...");
-
-            // 코스트가 있는지 확인
-            yield return new WaitForSeconds(1f);
-
-            int costBefore = _combatManager.CurrentCost;
-            Debug.Log($"  현재 코스트: {costBefore}/{_combatManager.MaxCost}");
-
-            // 코스트가 충분하면 스킬 버튼 클릭
-            if (costBefore >= 2)
-            {
-                var student = _combatManager.GetStudent(1); // Hoshino (코스트 2)
-                int expectedCost = student.Data.skillCost;
-
-                _combatManager.SimulateSkillButtonClick(1);
-                yield return null;
-
-                int costAfter = _combatManager.CurrentCost;
-                int costUsed = costBefore - costAfter;
-
-                Assert.AreEqual(expectedCost, costUsed, $"코스트 {expectedCost} 소모 확인");
-                Debug.Log($"  ✓ 코스트 소모: {costBefore} → {costAfter} (-{costUsed})");
-            }
-            else
-            {
-                Debug.Log("  코스트 부족, 충전 대기...");
-                yield return new WaitForSeconds(2f);
-            }
-
-            // 코스트 회복 확인
-            int costBeforeRegen = _combatManager.CurrentCost;
-            yield return new WaitForSeconds(2f);
-            int costAfterRegen = _combatManager.CurrentCost;
-
-            Assert.GreaterOrEqual(costAfterRegen, costBeforeRegen, "코스트 회복 확인");
-            Debug.Log($"  ✓ 코스트 회복: {costBeforeRegen} → {costAfterRegen}");
-
-            Debug.Log("[체크포인트 #4] ✅ 통과");
-
-            _testProgressPanel.UpdateCheckpoint(4, CheckpointStatus.Completed);
-            _testProgressPanel.UpdateMessage("코스트 소모 검증 완료!");
-            yield return new WaitForSeconds(0.5f);
-        }
-
-        /// <summary>
-        /// 체크포인트 #5: 전투별 데미지 추적
-        /// </summary>
-        private IEnumerator CheckpointFive_DamageTracking()
-        {
-            Debug.Log("\n[체크포인트 #5] 전투별 데미지 추적 시작");
-            _testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.InProgress);
             _testProgressPanel.UpdateMessage("데미지 추적 중...");
 
             var combatLog = _combatManager.CombatSystem.CombatLog;
@@ -536,20 +480,20 @@ namespace NexonGame.Tests.PlayMode
             Debug.Log($"  ✓ 최종 총 데미지: {combatLog.TotalDamageDealt}");
             Debug.Log($"  ✓ 총 스킬 사용: {combatLog.TotalSkillsUsed}회");
             Debug.Log($"  ✓ 격파한 적: {combatLog.TotalEnemiesDefeated}명");
-            Debug.Log("[체크포인트 #5] ✅ 통과");
+            Debug.Log("[체크포인트 #4] ✅ 통과");
 
-            _testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.Completed);
+            _testProgressPanel.UpdateCheckpoint(4, CheckpointStatus.Completed);
             _testProgressPanel.UpdateMessage("데미지 추적 완료!");
             yield return new WaitForSeconds(0.5f);
         }
 
         /// <summary>
-        /// 체크포인트 #6: 보상 획득 검증
+        /// 체크포인트 #5: 보상 획득 검증
         /// </summary>
-        private IEnumerator CheckpointSix_RewardVerification()
+        private IEnumerator CheckpointFive_RewardVerification()
         {
-            Debug.Log("\n[체크포인트 #6] 보상 획득 검증 시작");
-            _testProgressPanel.UpdateCheckpoint(6, CheckpointStatus.InProgress);
+            Debug.Log("\n[체크포인트 #5] 보상 획득 검증 시작");
+            _testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.InProgress);
             _testProgressPanel.UpdateMessage("보상 검증 중...");
 
             // 전투 완료 (스테이지에서만 처리)
@@ -602,16 +546,16 @@ namespace NexonGame.Tests.PlayMode
 
             yield return new WaitForSeconds(3f); // 보상 패널 확인 시간
 
-            Debug.Log("[체크포인트 #6] ✅ 통과");
+            Debug.Log("[체크포인트 #5] ✅ 통과");
 
-            _testProgressPanel.UpdateCheckpoint(6, CheckpointStatus.Completed);
+            _testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.Completed);
             _testProgressPanel.UpdateMessage("보상 획득 완료!");
             yield return new WaitForSeconds(1f);
 
             // RewardResultPanel 제거
             Object.Destroy(rewardPanelObj);
 
-            // 체크포인트 #6 정리: 전투 관련 오브젝트 제거
+            // 체크포인트 #5 정리: 전투 관련 오브젝트 제거
             var studentObjects = Object.FindObjectsByType<StudentObject>(FindObjectsSortMode.None);
             var enemyObjects = Object.FindObjectsByType<EnemyObject>(FindObjectsSortMode.None);
             var costDisplay = Object.FindFirstObjectByType<CostDisplay>();

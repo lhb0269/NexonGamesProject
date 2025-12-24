@@ -6,7 +6,7 @@ namespace NexonGame.BlueArchive.UI
 {
     /// <summary>
     /// 테스트 진행 상황 패널
-    /// - 6개 체크포인트 상태 표시
+    /// - 5개 체크포인트 상태 표시
     /// - 진행률 바
     /// - 현재 테스트 메시지
     /// </summary>
@@ -35,10 +35,9 @@ namespace NexonGame.BlueArchive.UI
         {
             "체크포인트 #1: 플랫폼 이동 검증",
             "체크포인트 #2: 전투 진입 검증",
-            "체크포인트 #3: EX 스킬 사용 로깅",
-            "체크포인트 #4: 코스트 소모 검증",
-            "체크포인트 #5: 전투별 데미지 추적",
-            "체크포인트 #6: 보상 획득 검증"
+            "체크포인트 #3: EX 스킬 사용 (코스트 소모 포함)",
+            "체크포인트 #4: 전투별 데미지 추적",
+            "체크포인트 #5: 보상 획득 검증"
         };
 
         private void Awake()
@@ -255,7 +254,7 @@ namespace NexonGame.BlueArchive.UI
             _progressText.fontSize = 14;
             _progressText.alignment = TextAnchor.MiddleCenter;
             _progressText.color = Color.white;
-            _progressText.text = "0 / 6";
+            _progressText.text = "0 / 5";
             _progressText.fontStyle = FontStyle.Bold;
         }
 
@@ -389,7 +388,7 @@ namespace NexonGame.BlueArchive.UI
             }
 
             _progressBar.value = 0f;
-            _progressText.text = "0 / 6";
+            _progressText.text = "0 / 5";
             _currentMessageText.text = "테스트 준비 중...";
 
             var fillImage = _progressBar.fillRect.GetComponent<Image>();
