@@ -244,7 +244,7 @@ namespace NexonGame.Tests.PlayMode
             panelObj.transform.SetParent(canvas.transform, false);
 
             _testProgressPanel = panelObj.AddComponent<TestProgressPanel>();
-            _testProgressPanel.Initialize();
+            // Awake()에서 자동으로 UI 생성됨
         }
 
         /// <summary>
@@ -259,59 +259,52 @@ namespace NexonGame.Tests.PlayMode
 
             var result = new CheckpointResult { CheckpointNumber = 1, Name = "플랫폼 이동 검증" };
 
-            try
+            // 스테이지 초기화
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            // 이동 경로
+            var movementPath = new List<Vector2Int>
             {
-                // 스테이지 초기화
-                _stageManager.InitializeStage(_testStageData);
-                yield return null;
+                new Vector2Int(1, 1),
+                new Vector2Int(0, 2),
+                new Vector2Int(1, 1),
+                new Vector2Int(2, 1),
+                new Vector2Int(3, 1)
+            };
 
-                // 이동 경로
-                var movementPath = new List<Vector2Int>
+            // 이동 실행
+            int successfulMoves = 0;
+            foreach (var targetPos in movementPath)
+            {
+                _stageManager.SimulatePlatformClick(targetPos);
+                yield return new WaitForSeconds(0.3f);
+
+                if (_stageManager.PlayerPosition == targetPos)
                 {
-                    new Vector2Int(1, 1),
-                    new Vector2Int(0, 2),
-                    new Vector2Int(1, 1),
-                    new Vector2Int(2, 1),
-                    new Vector2Int(3, 1)
-                };
-
-                // 이동 실행
-                int successfulMoves = 0;
-                foreach (var targetPos in movementPath)
-                {
-                    _stageManager.SimulatePlatformClick(targetPos);
-                    yield return new WaitForSeconds(0.3f);
-
-                    if (_stageManager.PlayerPosition == targetPos)
-                    {
-                        successfulMoves++;
-                    }
+                    successfulMoves++;
                 }
-
-                // 검증
-                bool allMovesSuccessful = successfulMoves == movementPath.Count;
-                bool reachedBattlePosition = _stageManager.PlayerPosition == _testStageData.battlePosition;
-                bool correctState = _stageManager.CurrentState == StageState.ReadyForBattle;
-
-                result.Passed = allMovesSuccessful && reachedBattlePosition && correctState;
-                result.Message = result.Passed
-                    ? $"✅ 성공 - 이동: {successfulMoves}/{movementPath.Count}, 최종 위치: {_stageManager.PlayerPosition}"
-                    : $"❌ 실패 - 이동: {successfulMoves}/{movementPath.Count}";
-
-                Debug.Log($"[체크포인트 #1] {result.Message}");
             }
-            catch (System.Exception e)
-            {
-                result.Passed = false;
-                result.Message = $"❌ 예외 발생: {e.Message}";
-                Debug.LogError($"[체크포인트 #1] {result.Message}");
-            }
+
+            // 검증
+            bool allMovesSuccessful = successfulMoves == movementPath.Count;
+            bool reachedBattlePosition = _stageManager.PlayerPosition == _testStageData.battlePosition;
+            bool correctState = _stageManager.CurrentState == StageState.ReadyForBattle;
+
+            result.Passed = allMovesSuccessful && reachedBattlePosition && correctState;
+            result.Message = result.Passed
+                ? $"✅ 성공 - 이동: {successfulMoves}/{movementPath.Count}, 최종 위치: {_stageManager.PlayerPosition}"
+                : $"❌ 실패 - 이동: {successfulMoves}/{movementPath.Count}";
+
+            Debug.Log($"[체크포인트 #1] {result.Message}");
 
             _results.Add(result);
             _testProgressPanel.UpdateCheckpoint(1, result.Passed ? CheckpointStatus.Completed : CheckpointStatus.Failed);
 
             if (result.Passed) _passedTests++;
             else _failedTests++;
+
+            yield return null;
         }
 
         /// <summary>
@@ -326,34 +319,25 @@ namespace NexonGame.Tests.PlayMode
 
             var result = new CheckpointResult { CheckpointNumber = 2, Name = "전투 진입 검증" };
 
-            try
-            {
-                // 전투 시작
-                _stageManager.StartBattle();
-                yield return null;
+            // 전투 시작
+            _stageManager.StartBattle();
+            yield return null;
 
-                // 전투 초기화
-                _combatManager.InitializeCombat(_testStudents, _testEnemies, _testStageData.stageName);
-                yield return new WaitForSeconds(0.5f);
+            // 전투 초기화
+            _combatManager.InitializeCombat(_testStudents, _testEnemies, _testStageData.stageName);
+            yield return new WaitForSeconds(0.5f);
 
-                // 검증
-                bool stageInBattle = _stageManager.CurrentState == StageState.InBattle;
-                bool combatInProgress = _combatManager.CurrentState == CombatState.InProgress;
-                bool costSystemReady = _combatManager.CurrentCost >= 0;
+            // 검증
+            bool stageInBattle = _stageManager.CurrentState == StageState.InBattle;
+            bool combatInProgress = _combatManager.CurrentState == CombatState.InProgress;
+            bool costSystemReady = _combatManager.CurrentCost >= 0;
 
-                result.Passed = stageInBattle && combatInProgress && costSystemReady;
-                result.Message = result.Passed
-                    ? $"✅ 성공 - 전투 상태: {_combatManager.CurrentState}, 코스트: {_combatManager.CurrentCost}"
-                    : $"❌ 실패 - 전투 초기화 오류";
+            result.Passed = stageInBattle && combatInProgress && costSystemReady;
+            result.Message = result.Passed
+                ? $"✅ 성공 - 전투 상태: {_combatManager.CurrentState}, 코스트: {_combatManager.CurrentCost}"
+                : $"❌ 실패 - 전투 초기화 오류";
 
-                Debug.Log($"[체크포인트 #2] {result.Message}");
-            }
-            catch (System.Exception e)
-            {
-                result.Passed = false;
-                result.Message = $"❌ 예외 발생: {e.Message}";
-                Debug.LogError($"[체크포인트 #2] {result.Message}");
-            }
+            Debug.Log($"[체크포인트 #2] {result.Message}");
 
             _results.Add(result);
             _testProgressPanel.UpdateCheckpoint(2, result.Passed ? CheckpointStatus.Completed : CheckpointStatus.Failed);
@@ -374,65 +358,58 @@ namespace NexonGame.Tests.PlayMode
 
             var result = new CheckpointResult { CheckpointNumber = 3, Name = "EX 스킬 사용 검증" };
 
-            try
+            var combatLog = _combatManager.CombatSystem.CombatLog;
+            int initialSkillCount = combatLog.TotalSkillsUsed;
+            int initialDamage = combatLog.TotalDamageDealt;
+
+            // 코스트 충전 대기
+            yield return new WaitForSeconds(2f);
+
+            // 스킬 사용
+            int skillsUsed = 0;
+            for (int i = 0; i < _testStudents.Count; i++)
             {
-                var combatLog = _combatManager.CombatSystem.CombatLog;
-                int initialSkillCount = combatLog.TotalSkillsUsed;
-                int initialDamage = combatLog.TotalDamageDealt;
+                var student = _testStudents[i];
 
-                // 코스트 충전 대기
-                yield return new WaitForSeconds(2f);
-
-                // 스킬 사용
-                int skillsUsed = 0;
-                for (int i = 0; i < _testStudents.Count; i++)
+                // 코스트 충분할 때까지 대기
+                while (_combatManager.CurrentCost < student.skillCost)
                 {
-                    var student = _testStudents[i];
-
-                    // 코스트 충분할 때까지 대기
-                    while (_combatManager.CurrentCost < student.skillCost)
-                    {
-                        yield return new WaitForSeconds(1f);
-                    }
-
-                    // 스킬 사용
-                    _combatManager.SimulateSkillButtonClick(i);
-                    yield return new WaitForSeconds(0.3f);
-                    skillsUsed++;
-
-                    // 적 전멸 확인
-                    if (_combatManager.GetAliveEnemyCount() == 0)
-                        break;
+                    yield return new WaitForSeconds(1f);
                 }
 
-                // 검증
-                int finalSkillCount = combatLog.TotalSkillsUsed;
-                int finalDamage = combatLog.TotalDamageDealt;
-                int totalCostSpent = combatLog.TotalCostSpent;
+                // 스킬 사용
+                _combatManager.SimulateSkillButtonClick(i);
+                yield return new WaitForSeconds(0.3f);
+                skillsUsed++;
 
-                bool skillsExecuted = finalSkillCount > initialSkillCount;
-                bool damageDealt = finalDamage > initialDamage;
-                bool costSpent = totalCostSpent > 0;
-
-                result.Passed = skillsExecuted && damageDealt && costSpent;
-                result.Message = result.Passed
-                    ? $"✅ 성공 - 스킬: {finalSkillCount}회, 데미지: {finalDamage}, 코스트: {totalCostSpent}"
-                    : $"❌ 실패 - 스킬/데미지/코스트 미기록";
-
-                Debug.Log($"[체크포인트 #3] {result.Message}");
+                // 적 전멸 확인
+                if (_combatManager.GetAliveEnemyCount() == 0)
+                    break;
             }
-            catch (System.Exception e)
-            {
-                result.Passed = false;
-                result.Message = $"❌ 예외 발생: {e.Message}";
-                Debug.LogError($"[체크포인트 #3] {result.Message}");
-            }
+
+            // 검증
+            int finalSkillCount = combatLog.TotalSkillsUsed;
+            int finalDamage = combatLog.TotalDamageDealt;
+            int totalCostSpent = combatLog.TotalCostSpent;
+
+            bool skillsExecuted = finalSkillCount > initialSkillCount;
+            bool damageDealt = finalDamage > initialDamage;
+            bool costSpent = totalCostSpent > 0;
+
+            result.Passed = skillsExecuted && damageDealt && costSpent;
+            result.Message = result.Passed
+                ? $"✅ 성공 - 스킬: {finalSkillCount}회, 데미지: {finalDamage}, 코스트: {totalCostSpent}"
+                : $"❌ 실패 - 스킬/데미지/코스트 미기록";
+
+            Debug.Log($"[체크포인트 #3] {result.Message}");
 
             _results.Add(result);
             _testProgressPanel.UpdateCheckpoint(3, result.Passed ? CheckpointStatus.Completed : CheckpointStatus.Failed);
 
             if (result.Passed) _passedTests++;
             else _failedTests++;
+
+            yield return null;
         }
 
         /// <summary>
@@ -447,45 +424,38 @@ namespace NexonGame.Tests.PlayMode
 
             var result = new CheckpointResult { CheckpointNumber = 4, Name = "데미지 추적 검증" };
 
-            try
+            var combatLog = _combatManager.CombatSystem.CombatLog;
+
+            // 현재 데미지 확인
+            int currentDamage = combatLog.TotalDamageDealt;
+
+            // 살아있는 적이 있으면 추가 공격
+            if (_combatManager.GetAliveEnemyCount() > 0)
             {
-                var combatLog = _combatManager.CombatSystem.CombatLog;
-
-                // 현재 데미지 확인
-                int currentDamage = combatLog.TotalDamageDealt;
-
-                // 살아있는 적이 있으면 추가 공격
-                if (_combatManager.GetAliveEnemyCount() > 0)
-                {
-                    yield return new WaitForSeconds(2f);
-                    _combatManager.SimulateSkillButtonClick(0);
-                    yield return new WaitForSeconds(0.5f);
-                }
-
-                // 검증
-                int finalDamage = combatLog.TotalDamageDealt;
-                bool damageIncreased = finalDamage >= currentDamage;
-                bool hasStudentStats = combatLog.StudentDamageStats.Count > 0;
-
-                result.Passed = damageIncreased && hasStudentStats;
-                result.Message = result.Passed
-                    ? $"✅ 성공 - 총 데미지: {finalDamage}, 학생별 통계: {combatLog.StudentDamageStats.Count}명"
-                    : $"❌ 실패 - 데미지 추적 오류";
-
-                Debug.Log($"[체크포인트 #4] {result.Message}");
+                yield return new WaitForSeconds(2f);
+                _combatManager.SimulateSkillButtonClick(0);
+                yield return new WaitForSeconds(0.5f);
             }
-            catch (System.Exception e)
-            {
-                result.Passed = false;
-                result.Message = $"❌ 예외 발생: {e.Message}";
-                Debug.LogError($"[체크포인트 #4] {result.Message}");
-            }
+
+            // 검증
+            int finalDamage = combatLog.TotalDamageDealt;
+            bool damageIncreased = finalDamage >= currentDamage;
+            bool hasStudentStats = combatLog.StudentDamageStats.Count > 0;
+
+            result.Passed = damageIncreased && hasStudentStats;
+            result.Message = result.Passed
+                ? $"✅ 성공 - 총 데미지: {finalDamage}, 학생별 통계: {combatLog.StudentDamageStats.Count}명"
+                : $"❌ 실패 - 데미지 추적 오류";
+
+            Debug.Log($"[체크포인트 #4] {result.Message}");
 
             _results.Add(result);
             _testProgressPanel.UpdateCheckpoint(4, result.Passed ? CheckpointStatus.Completed : CheckpointStatus.Failed);
 
             if (result.Passed) _passedTests++;
             else _failedTests++;
+
+            yield return null;
         }
 
         /// <summary>
@@ -500,38 +470,31 @@ namespace NexonGame.Tests.PlayMode
 
             var result = new CheckpointResult { CheckpointNumber = 5, Name = "보상 획득 검증" };
 
-            try
-            {
-                // 전투 완료
-                _stageManager.CompleteBattle(victory: true);
-                yield return null;
+            // 전투 완료
+            _stageManager.CompleteBattle(victory: true);
+            yield return null;
 
-                // 스테이지 클리어
-                _stageManager.ClearStage();
-                yield return null;
+            // 스테이지 클리어
+            _stageManager.ClearStage();
+            yield return null;
 
-                // 검증
-                bool stageCleared = _stageManager.CurrentState == StageState.StageCleared;
+            // 검증
+            bool stageCleared = _stageManager.CurrentState == StageState.StageCleared;
 
-                result.Passed = stageCleared;
-                result.Message = result.Passed
-                    ? $"✅ 성공 - 스테이지 클리어: {_stageManager.CurrentState}"
-                    : $"❌ 실패 - 스테이지 상태 오류";
+            result.Passed = stageCleared;
+            result.Message = result.Passed
+                ? $"✅ 성공 - 스테이지 클리어: {_stageManager.CurrentState}"
+                : $"❌ 실패 - 스테이지 상태 오류";
 
-                Debug.Log($"[체크포인트 #5] {result.Message}");
-            }
-            catch (System.Exception e)
-            {
-                result.Passed = false;
-                result.Message = $"❌ 예외 발생: {e.Message}";
-                Debug.LogError($"[체크포인트 #5] {result.Message}");
-            }
+            Debug.Log($"[체크포인트 #5] {result.Message}");
 
             _results.Add(result);
             _testProgressPanel.UpdateCheckpoint(5, result.Passed ? CheckpointStatus.Completed : CheckpointStatus.Failed);
 
             if (result.Passed) _passedTests++;
             else _failedTests++;
+
+            yield return null;
         }
 
         /// <summary>
