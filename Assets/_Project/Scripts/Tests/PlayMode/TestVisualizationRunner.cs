@@ -163,36 +163,32 @@ namespace NexonGame.Tests.PlayMode
             var arisu = ScriptableObject.CreateInstance<StudentData>();
             arisu.studentName = "아리스";
             arisu.maxHP = 1000;
-            arisu.attackPower = 100;
-            arisu.skillCost = 4;
-            arisu.exSkill = CreateSkill("EX: 정의의 일격", 500, 1f, 20f, SkillTargetType.Single);
+            arisu.attack = 100;
+            arisu.exSkill = CreateSkill("EX: 정의의 일격", 500, 1f, 20f, SkillTargetType.Single, 4);
             students.Add(arisu);
 
             // 호시노
             var hoshino = ScriptableObject.CreateInstance<StudentData>();
             hoshino.studentName = "호시노";
             hoshino.maxHP = 1200;
-            hoshino.attackPower = 80;
-            hoshino.skillCost = 5;
-            hoshino.exSkill = CreateSkill("EX: 수호의 맹세", 300, 1f, 25f, SkillTargetType.Multiple);
+            hoshino.attack = 80;
+            hoshino.exSkill = CreateSkill("EX: 수호의 맹세", 300, 1f, 25f, SkillTargetType.Multiple, 5);
             students.Add(hoshino);
 
             // 이로하
             var iroha = ScriptableObject.CreateInstance<StudentData>();
             iroha.studentName = "이로하";
             iroha.maxHP = 900;
-            iroha.attackPower = 120;
-            iroha.skillCost = 3;
-            iroha.exSkill = CreateSkill("EX: 신속한 사격", 400, 1f, 15f, SkillTargetType.Single);
+            iroha.attack = 120;
+            iroha.exSkill = CreateSkill("EX: 신속한 사격", 400, 1f, 15f, SkillTargetType.Single, 3);
             students.Add(iroha);
 
             // 시로코
             var shiroko = ScriptableObject.CreateInstance<StudentData>();
             shiroko.studentName = "시로코";
             shiroko.maxHP = 950;
-            shiroko.attackPower = 110;
-            shiroko.skillCost = 4;
-            shiroko.exSkill = CreateSkill("EX: 전술 지원", 350, 1f, 20f, SkillTargetType.Area);
+            shiroko.attack = 110;
+            shiroko.exSkill = CreateSkill("EX: 전술 지원", 350, 1f, 20f, SkillTargetType.Area, 4);
             students.Add(shiroko);
 
             return students;
@@ -201,7 +197,7 @@ namespace NexonGame.Tests.PlayMode
         /// <summary>
         /// 테스트용 스킬 데이터 생성
         /// </summary>
-        private SkillData CreateSkill(string name, int damage, float multiplier, float cooldown, SkillTargetType targetType)
+        private SkillData CreateSkill(string name, int damage, float multiplier, float cooldown, SkillTargetType targetType, int cost)
         {
             var skill = ScriptableObject.CreateInstance<SkillData>();
             skill.skillName = name;
@@ -209,6 +205,7 @@ namespace NexonGame.Tests.PlayMode
             skill.damageMultiplier = multiplier;
             skill.cooldownTime = cooldown;
             skill.targetType = targetType;
+            skill.costAmount = cost;
             return skill;
         }
 
@@ -221,10 +218,7 @@ namespace NexonGame.Tests.PlayMode
 
             for (int i = 0; i < 3; i++)
             {
-                var enemy = ScriptableObject.CreateInstance<EnemyData>();
-                enemy.enemyName = $"일반병{i + 1}";
-                enemy.maxHP = 500;
-                enemy.attackPower = 50;
+                var enemy = new EnemyData($"일반병{i + 1}", 500, 50, 20);
                 enemies.Add(enemy);
             }
 
