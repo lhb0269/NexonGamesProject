@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NexonGame.BlueArchive.Stage
 {
@@ -7,6 +8,7 @@ namespace NexonGame.BlueArchive.Stage
     /// - 발판 비주얼 표현
     /// - 플랫폼 타입별 색상 구분
     /// - 하이라이트 효과
+    /// - 클릭 가능한 버튼으로 작동
     /// </summary>
     public class PlatformObject : MonoBehaviour
     {
@@ -22,6 +24,7 @@ namespace NexonGame.BlueArchive.Stage
         private Color _originalColor;
         private bool _isHighlighted;
         private MaterialPropertyBlock _propertyBlock;
+        private System.Action<Vector2Int> _onPlatformClicked;
 
         /// <summary>
         /// 프로퍼티
@@ -43,10 +46,11 @@ namespace NexonGame.BlueArchive.Stage
         /// <summary>
         /// 초기화
         /// </summary>
-        public void Initialize(Vector2Int gridPosition, PlatformType type)
+        public void Initialize(Vector2Int gridPosition, PlatformType type, System.Action<Vector2Int> onPlatformClicked = null)
         {
             _gridPosition = gridPosition;
             _platformType = type;
+            _onPlatformClicked = onPlatformClicked;
 
             // 이름 설정 (태그는 사용하지 않음)
             gameObject.name = $"Platform_{type}_{gridPosition.x}_{gridPosition.y}";
@@ -110,6 +114,16 @@ namespace NexonGame.BlueArchive.Stage
         }
 
         /// <summary>
+        /// 마우스 클릭 시 (플랫폼 이동)
+        /// </summary>
+        private void OnMouseDown()
+        {
+            // 클릭 이벤트 발생
+            _onPlatformClicked?.Invoke(_gridPosition);
+            Debug.Log($"[PlatformObject] 플랫폼 클릭: {_gridPosition}");
+        }
+
+        /// <summary>
         /// 마우스 오버 시 (선택 사항)
         /// </summary>
         private void OnMouseEnter()
@@ -129,6 +143,14 @@ namespace NexonGame.BlueArchive.Stage
             {
                 SetColor(_originalColor);
             }
+        }
+
+        /// <summary>
+        /// 프로그래매틱 클릭 시뮬레이션 (테스트용)
+        /// </summary>
+        public void SimulateClick()
+        {
+            OnMouseDown();
         }
 
         /// <summary>

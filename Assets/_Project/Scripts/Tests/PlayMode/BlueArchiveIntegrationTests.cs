@@ -305,19 +305,29 @@ namespace NexonGame.Tests.PlayMode
             yield return new WaitForSeconds(0.5f);
 
             // ========================================
-            // Act: 경로를 따라 플레이어 이동
+            // Act: 경로를 따라 플랫폼 클릭으로 플레이어 이동
             // ========================================
-            Debug.Log("  [Act] 플레이어 이동 실행");
+            Debug.Log("  [Act] 플랫폼 클릭을 통한 플레이어 이동 실행");
 
             int successfulMoves = 0;
             foreach (var targetPos in movementPath)
             {
-                bool moved = _stageManager.MovePlayer(targetPos);
+                Vector2Int currentPos = _stageManager.PlayerPosition;
+                Debug.Log($"    - 현재 위치: {currentPos}, 목표 플랫폼 클릭: {targetPos}");
 
-                if (moved)
+                // Act: 플랫폼 클릭 시뮬레이션
+                _stageManager.SimulatePlatformClick(targetPos);
+                yield return null;
+
+                // 이동 성공 여부 확인
+                if (_stageManager.PlayerPosition == targetPos)
                 {
                     successfulMoves++;
                     Debug.Log($"    - 이동 성공: {_stageManager.PlayerPosition}");
+                }
+                else
+                {
+                    Debug.LogWarning($"    - 이동 실패: 현재 위치 {_stageManager.PlayerPosition}");
                 }
 
                 yield return new WaitForSeconds(0.3f);
@@ -766,6 +776,158 @@ namespace NexonGame.Tests.PlayMode
                 Object.Destroy(combatStatusPanel.gameObject);
 
             Debug.Log($"  🧹 전투 오브젝트 정리 완료 (학생 {studentObjects.Length}명, 적 {enemyObjects.Length}명, UI 패널 3개)");
+            yield return null;
+        }
+
+        /// <summary>
+        /// 인접하지 않은 플랫폼 클릭 시 이동 실패 테스트
+        /// </summary>
+        [UnityTest]
+        public IEnumerator PlatformClick_NonAdjacent_ShouldFail()
+        {
+            Debug.Log("\n[단위 테스트] 인접하지 않은 플랫폼 클릭 테스트 시작");
+
+            // ========================================
+            // Arrange: 스테이지 초기화
+            // ========================================
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            Vector2Int initialPosition = _stageManager.PlayerPosition; // (0, 0)
+            Vector2Int nonAdjacentPosition = new Vector2Int(3, 1); // 3칸 떨어진 위치
+
+            Debug.Log($"  [Arrange] 초기 위치: {initialPosition}, 비인접 목표: {nonAdjacentPosition}");
+
+            // ========================================
+            // Act: 인접하지 않은 플랫폼 클릭
+            // ========================================
+            Debug.Log("  [Act] 비인접 플랫폼 클릭 시도");
+            _stageManager.SimulatePlatformClick(nonAdjacentPosition);
+            yield return null;
+
+            // ========================================
+            // Assert: 이동하지 않아야 함
+            // ========================================
+            Debug.Log("  [Assert] 이동 실패 검증");
+
+            Assert.AreEqual(initialPosition, _stageManager.PlayerPosition,
+                "인접하지 않은 플랫폼 클릭 시 이동하지 않아야 함");
+
+            Assert.AreEqual(0, _stageManager.TotalMovesInStage,
+                "이동 횟수가 증가하지 않아야 함");
+
+            Debug.Log($"    ✓ 위치 유지: {_stageManager.PlayerPosition}");
+            Debug.Log($"    ✓ 이동 횟수: {_stageManager.TotalMovesInStage}");
+            Debug.Log("[단위 테스트] ✅ 통과 - 비인접 플랫폼 이동 실패 확인");
+
+            // 정리
+            var platforms = Object.FindObjectsByType<PlatformObject>(FindObjectsSortMode.None);
+            foreach (var platform in platforms)
+            {
+                Object.Destroy(platform.gameObject);
+            }
+            yield return null;
+        }
+
+        /// <summary>
+        /// 인접한 플랫폼 클릭 시 이동 성공 테스트 (8방향)
+        /// </summary>
+        [UnityTest]
+        public IEnumerator PlatformClick_Adjacent8Directions_ShouldSucceed()
+        {
+            Debug.Log("\n[단위 테스트] 8방향 인접 플랫폼 클릭 테스트 시작");
+
+            // ========================================
+            // Arrange: 스테이지 초기화
+            // ========================================
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            // 시작 위치: (0, 0)
+            // 인접 8방향: N(0,1), S(0,-1), E(1,0), W(-1,0), NE(1,1), NW(-1,1), SE(1,-1), SW(-1,-1)
+            // 실제 존재하는 플랫폼: (1, 1) - NE 방향
+            Vector2Int startPos = new Vector2Int(0, 0);
+            Vector2Int adjacentPos = new Vector2Int(1, 1);
+
+            Debug.Log($"  [Arrange] 시작 위치: {startPos}, 인접 플랫폼 (NE): {adjacentPos}");
+
+            // ========================================
+            // Act: 인접한 플랫폼 클릭
+            // ========================================
+            Debug.Log("  [Act] 인접 플랫폼 클릭 (대각선 NE 방향)");
+            _stageManager.SimulatePlatformClick(adjacentPos);
+            yield return null;
+
+            // ========================================
+            // Assert: 이동 성공 확인
+            // ========================================
+            Debug.Log("  [Assert] 이동 성공 검증");
+
+            Assert.AreEqual(adjacentPos, _stageManager.PlayerPosition,
+                "인접한 플랫폼 클릭 시 이동해야 함");
+
+            Assert.AreEqual(1, _stageManager.TotalMovesInStage,
+                "이동 횟수가 1 증가해야 함");
+
+            Debug.Log($"    ✓ 최종 위치: {_stageManager.PlayerPosition}");
+            Debug.Log($"    ✓ 이동 횟수: {_stageManager.TotalMovesInStage}");
+            Debug.Log("[단위 테스트] ✅ 통과 - 인접 플랫폼 이동 성공 확인");
+
+            // 정리
+            var platforms = Object.FindObjectsByType<PlatformObject>(FindObjectsSortMode.None);
+            foreach (var platform in platforms)
+            {
+                Object.Destroy(platform.gameObject);
+            }
+            yield return null;
+        }
+
+        /// <summary>
+        /// 동일한 플랫폼 클릭 시 이동 실패 테스트
+        /// </summary>
+        [UnityTest]
+        public IEnumerator PlatformClick_SamePosition_ShouldFail()
+        {
+            Debug.Log("\n[단위 테스트] 동일 위치 플랫폼 클릭 테스트 시작");
+
+            // ========================================
+            // Arrange: 스테이지 초기화
+            // ========================================
+            _stageManager.InitializeStage(_testStageData);
+            yield return null;
+
+            Vector2Int currentPosition = _stageManager.PlayerPosition; // (0, 0)
+
+            Debug.Log($"  [Arrange] 현재 위치: {currentPosition}");
+
+            // ========================================
+            // Act: 동일한 위치의 플랫폼 클릭
+            // ========================================
+            Debug.Log("  [Act] 동일 위치 플랫폼 클릭 시도");
+            _stageManager.SimulatePlatformClick(currentPosition);
+            yield return null;
+
+            // ========================================
+            // Assert: 이동하지 않아야 함
+            // ========================================
+            Debug.Log("  [Assert] 이동 실패 검증");
+
+            Assert.AreEqual(currentPosition, _stageManager.PlayerPosition,
+                "동일 위치 클릭 시 이동하지 않아야 함");
+
+            Assert.AreEqual(0, _stageManager.TotalMovesInStage,
+                "이동 횟수가 증가하지 않아야 함");
+
+            Debug.Log($"    ✓ 위치 유지: {_stageManager.PlayerPosition}");
+            Debug.Log($"    ✓ 이동 횟수: {_stageManager.TotalMovesInStage}");
+            Debug.Log("[단위 테스트] ✅ 통과 - 동일 위치 이동 실패 확인");
+
+            // 정리
+            var platforms = Object.FindObjectsByType<PlatformObject>(FindObjectsSortMode.None);
+            foreach (var platform in platforms)
+            {
+                Object.Destroy(platform.gameObject);
+            }
             yield return null;
         }
     }

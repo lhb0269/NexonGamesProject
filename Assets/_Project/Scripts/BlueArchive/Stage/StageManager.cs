@@ -136,7 +136,7 @@ namespace NexonGame.BlueArchive.Stage
                 platform = platformObj.AddComponent<PlatformObject>();
             }
 
-            platform.Initialize(gridPos, type);
+            platform.Initialize(gridPos, type, OnPlatformClicked);
             _platforms.Add(platform);
         }
 
@@ -170,7 +170,7 @@ namespace NexonGame.BlueArchive.Stage
             platformObj.transform.localScale = new Vector3(0.8f, 0.1f, 0.8f);
 
             PlatformObject platform = platformObj.AddComponent<PlatformObject>();
-            platform.Initialize(gridPos, type);
+            platform.Initialize(gridPos, type, OnPlatformClicked);
             _platforms.Add(platform);
         }
 
@@ -218,6 +218,45 @@ namespace NexonGame.BlueArchive.Stage
                 worldPos.y += 0.5f; // 약간 위로
                 _playerMarker.transform.position = worldPos;
             }
+        }
+
+        /// <summary>
+        /// 플랫폼 클릭 핸들러
+        /// </summary>
+        private void OnPlatformClicked(Vector2Int targetPosition)
+        {
+            Debug.Log($"[StageManager] 플랫폼 클릭됨: {targetPosition}");
+
+            // 인접 여부 확인
+            if (!IsAdjacent(_stageController.PlayerPosition, targetPosition))
+            {
+                Debug.LogWarning($"[StageManager] 이동 실패: {targetPosition}는 인접하지 않은 플랫폼입니다.");
+                return;
+            }
+
+            // 이동 시도
+            bool success = MovePlayer(targetPosition);
+
+            if (!success)
+            {
+                Debug.LogWarning($"[StageManager] 이동 실패: {targetPosition}로 이동할 수 없습니다.");
+            }
+        }
+
+        /// <summary>
+        /// 두 위치가 인접한지 확인 (8방향: 상하좌우 + 대각선)
+        /// </summary>
+        private bool IsAdjacent(Vector2Int from, Vector2Int to)
+        {
+            int dx = Mathf.Abs(to.x - from.x);
+            int dy = Mathf.Abs(to.y - from.y);
+
+            // 8방향 인접: dx와 dy가 모두 0 또는 1이어야 하며, 동일 위치는 제외
+            bool isAdjacent = (dx <= 1 && dy <= 1) && !(dx == 0 && dy == 0);
+
+            Debug.Log($"[StageManager] 인접 체크: {from} → {to}, dx={dx}, dy={dy}, 결과={isAdjacent}");
+
+            return isAdjacent;
         }
 
         /// <summary>
@@ -337,6 +376,37 @@ namespace NexonGame.BlueArchive.Stage
         private void OnDestroy()
         {
             ResetStage();
+        }
+
+        /// <summary>
+        /// 특정 위치의 플랫폼 찾기 (테스트용)
+        /// </summary>
+        public PlatformObject FindPlatformAt(Vector2Int gridPosition)
+        {
+            foreach (var platform in _platforms)
+            {
+                if (platform != null && platform.GridPosition == gridPosition)
+                {
+                    return platform;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 플랫폼 클릭 시뮬레이션 (테스트용)
+        /// </summary>
+        public void SimulatePlatformClick(Vector2Int gridPosition)
+        {
+            var platform = FindPlatformAt(gridPosition);
+            if (platform != null)
+            {
+                platform.SimulateClick();
+            }
+            else
+            {
+                Debug.LogWarning($"[StageManager] 플랫폼을 찾을 수 없음: {gridPosition}");
+            }
         }
 
         /// <summary>

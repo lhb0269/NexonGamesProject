@@ -85,8 +85,9 @@ namespace NexonGame.BlueArchive.Skill
             // 스킬 사용 (쿨다운 시작)
             student.UseSkill();
 
-            // 로그 기록
+            // 로그 기록 (스킬 사용 + 코스트 소모)
             _combatLog.LogSkillUsed(student.Data.studentName, skill.skillName, requiredCost);
+            _combatLog.LogCostSpent(student.Data.studentName, requiredCost, _costSystem.CurrentCost);
 
             // 대상 선택 및 데미지 계산
             List<Enemy> selectedTargets = SelectTargets(targets, skill.targetType);

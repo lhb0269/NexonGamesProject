@@ -4,5 +4,6 @@
   <Project Path="NexonGame.Runtime.csproj" />
   <Project Path="NexonGame.Editor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="NexonGame.Tests.Automation.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
 </Solution>
