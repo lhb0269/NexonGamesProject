@@ -25,14 +25,6 @@
    - 로그 출력 및 디버깅 가능
 5. **Build 클릭**: 실행 파일 저장 위치 선택
 
-### 빌드 결과물
-```
-빌드폴더/
-├── NexonGamesProject.exe        # 실행 파일
-├── NexonGamesProject_Data/      # 게임 데이터
-├── MonoBleedingEdge/            # .NET 런타임
-└── UnityPlayer.dll              # Unity 엔진
-```
 
 ### 실행 및 로그 확인
 - **실행**: `NexonGamesProject.exe` 더블 클릭
@@ -110,23 +102,6 @@ namespace NexonGame.Tests.Automation
    - Hierarchy에서 TestRunner GameObject 선택
    - Inspector에서 기존 TestBootstrap 제거
    - Automation 폴더의 TestBootstrap 추가
-
-### 최종 어셈블리 구조
-```
-Assets/_Project/Scripts/Tests/
-├── PlayMode/                          # NUnit 테스트 전용
-│   ├── NexonGame.Tests.PlayMode.asmdef
-│   │   └── defineConstraints: ["UNITY_INCLUDE_TESTS"]
-│   ├── StagePlayModeTests.cs
-│   ├── CombatPlayModeTests.cs
-│   └── BlueArchiveIntegrationTests.cs
-│
-└── Automation/                        # 빌드 포함 자동화
-    ├── NexonGame.Tests.Automation.asmdef
-    │   └── defineConstraints: []
-    ├── TestVisualizationRunner.cs
-    └── TestBootstrap.cs
-```
 
 ---
 
@@ -351,22 +326,6 @@ error CS0246: The type or namespace name 'UnityTest' could not be found
 }
 ```
 
-### 폴더 구조
-```
-Assets/_Project/Scripts/Tests/
-│
-├── PlayMode/                          # 에디터 전용
-│   ├── NexonGame.Tests.PlayMode.asmdef
-│   ├── StagePlayModeTests.cs          # [UnityTest] 사용
-│   ├── CombatPlayModeTests.cs         # [UnitySetUp] 사용
-│   └── BlueArchiveIntegrationTests.cs # [UnityTearDown] 사용
-│
-└── Automation/                        # 빌드 포함
-    ├── NexonGame.Tests.Automation.asmdef
-    ├── TestVisualizationRunner.cs     # NUnit 미사용
-    └── TestBootstrap.cs               # NUnit 미사용
-```
-
 ### 검증 방법
 ```bash
 # PlayMode 어셈블리 확인 (UNITY_INCLUDE_TESTS 있어야 함)
@@ -397,9 +356,3 @@ cat Assets/_Project/Scripts/Tests/Automation/NexonGame.Tests.Automation.asmdef
 4. **책임 분리**: 테스트 코드와 프로덕션 코드 명확히 구분
 
 ---
-
-## 참고 자료
-
-- [Unity Assembly Definitions](https://docs.unity3d.com/Manual/ScriptCompilationAssemblyDefinitionFiles.html)
-- [Unity New Input System](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/manual/index.html)
-- [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/index.html)
