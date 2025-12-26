@@ -23,48 +23,18 @@
 
 ---
 
-## 실행 환경
-
-### 필수 요구사항
-- **Unity 버전**: 6000.2.9f1 이상
-- **운영체제**: Windows 10/11, macOS 10.15+, Linux
-- **메모리**: 최소 4GB RAM
-- **저장공간**: 최소 2GB 여유 공간
-
-### 프로젝트 설정
-```
-Unity Hub → 프로젝트 열기 → NexonGamesProject 선택
-```
-
----
-
 ## 테스트 실행 방법
 
 ### 1. Unity Editor에서 실행
 
-#### 방법 A: Test Runner 창 사용
+#### 방법: Test Runner 창 사용
 1. Unity Editor 상단 메뉴: `Window` → `General` → `Test Runner`
 2. `PlayMode` 탭 선택
 3. `BlueArchiveIntegrationTests` 확장
 4. `FullIntegration_AllFiveCheckpoints_ShouldPass` 우클릭
 5. `Run Selected` 클릭
 
-#### 방법 B: 전체 PlayMode 테스트 실행
-1. Test Runner 창 열기
-2. `PlayMode` 탭에서 `Run All` 클릭
-3. 모든 통합 테스트 및 단위 테스트 실행
-
-### 2. 명령줄에서 실행
-
-```bash
-# Windows
-Unity.exe -runTests -batchmode -projectPath "C:\NexonGamesProject\NexonGamesProject" -testResults "TestResults.xml" -testPlatform PlayMode
-
-# macOS
-/Applications/Unity/Hub/Editor/6000.2.9f1/Unity.app/Contents/MacOS/Unity -runTests -batchmode -projectPath "/path/to/NexonGamesProject" -testResults "TestResults.xml" -testPlatform PlayMode
-```
-
-### 3. 테스트 실행 시간
+### . 테스트 실행 시간
 - **전체 통합 테스트**: 약 30-40초
 - **개별 체크포인트**: 각 5-10초
 - **단위 테스트**: 각 1초 미만
@@ -90,7 +60,7 @@ Unity.exe -runTests -batchmode -projectPath "C:\NexonGamesProject\NexonGamesProj
 
 #### 검증 항목
 ```
-✓ 플랫폼 생성 개수 확인 (시작 1개 + 일반 4개 + 전투 1개 = 6개)
+✓ 플랫폼 생성 개수 확인 (일반 4개 + 전투 1개 = 5개)
 ✓ 모든 이동이 성공적으로 완료됨
 ✓ 최종 위치가 전투 위치 (3, 1)임
 ✓ 스테이지 상태가 ReadyForBattle로 변경됨
@@ -114,28 +84,6 @@ bool IsAdjacent(Vector2Int from, Vector2Int to)
 - 존재하지 않는 플랫폼으로 이동 시도
 - 이동 횟수가 예상과 다름
 - 최종 위치가 전투 위치가 아님
-
-#### 로그 예시
-```
-[체크포인트 #1] 플랫폼 이동 검증 시작 (AAA 패턴)
-  [Arrange] 스테이지 초기화
-    - 생성된 플랫폼: 6개
-    - 시작 위치: (0, 0)
-    - 목표 위치: (3, 1)
-    - 이동 경로: 5칸
-  [Act] 플랫폼 클릭을 통한 플레이어 이동 실행
-    - 현재 위치: (0, 0), 목표 플랫폼 클릭: (1, 1)
-    - 이동 성공: (1, 1)
-    - 현재 위치: (1, 1), 목표 플랫폼 클릭: (0, 2)
-    - 이동 성공: (0, 2)
-    ...
-  [Assert] 이동 결과 검증
-    ✓ 성공한 이동: 5/5
-    ✓ 최종 위치: (3, 1)
-    ✓ 스테이지 상태: ReadyForBattle
-    ✓ 총 이동 횟수: 5회
-[체크포인트 #1] ✅ 통과
-```
 
 ---
 
@@ -183,26 +131,6 @@ bool IsAdjacent(Vector2Int from, Vector2Int to)
 - 캐릭터 오브젝트 생성 개수가 다름
 - UI 패널이 생성되지 않음
 - 코스트 시스템이 초기화되지 않음
-
-#### 로그 예시
-```
-[체크포인트 #2] 전투 진입 검증 시작 (AAA 패턴)
-  [Arrange] 전투 진입 준비
-    - 초기 스테이지 상태: ReadyForBattle
-    - 학생 데이터: 4명
-    - 적 데이터: 3명
-  [Act] 전투 시작 및 초기화 실행
-    [StageManager] Battle started!
-    [CombatManager] 전투 초기화 완료: 4명 학생 vs 3명 적
-  [Assert] 전투 진입 결과 검증
-    ✓ 스테이지 상태: InBattle
-    ✓ 전투 상태: InProgress
-    ✓ 학생 오브젝트: 4명
-    ✓ 적 오브젝트: 3명
-    ✓ UI 패널: CostDisplay, CombatLog, CombatStatus, SkillButton
-    ✓ 코스트 시스템: 5/10
-[체크포인트 #2] ✅ 통과
-```
 
 ---
 
@@ -267,32 +195,6 @@ bool IsAdjacent(Vector2Int from, Vector2Int to)
 - 코스트 부족 시 스킬이 사용됨
 - 쿨타임 중 스킬이 재사용됨
 
-#### 로그 예시
-```
-[체크포인트 #3] EX 스킬 사용 로깅 시작 (AAA 패턴)
-  [Arrange] 테스트 환경 준비
-    - 초기 스킬 사용 횟수: 0
-    - 초기 데미지: 0
-    - 초기 코스트: 5/10
-    - 코스트 충전 대기...
-  [Act] 학생 스킬 사용 실행
-    - [아리스] 스킬 버튼 클릭 (코스트: 4)
-      [CombatLog] 아리스이(가) [EX: 정의의 일격] 스킬 사용 (코스트: 4)
-      [CombatLog] 코스트 소모: -4 (남은 코스트: 1)
-      [CombatLog] 아리스 → 일반병1: 500  데미지
-      [CombatLog] 아리스이(가) 일반병1을(를) 격파!
-    - [호시노] 스킬 버튼 클릭 (코스트: 5)
-      (코스트 충전 대기...)
-      [CombatLog] 호시노이(가) [EX: 수호의 맹세] 스킬 사용 (코스트: 5)
-      ...
-  [Assert] 결과 검증
-    ✓ 스킬 사용: 0 → 3 (+3)
-    ✓ 총 데미지: 0 → 1250 (+1250)
-    ✓ 코스트 소모: 12 (현재: 3/10)
-    ✓ 실제 사용한 학생 수: 3명
-[체크포인트 #3] ✅ 통과
-```
-
 ---
 
 ### 체크포인트 #4: 전투별 데미지 추적
@@ -342,29 +244,6 @@ public void LogDamageDealt(string actorName, string targetName, int damage)
 - 학생별 통계가 비어있음
 - 학생별 데미지 합계가 총 데미지와 다름
 - 격파한 적 수가 잘못 기록됨
-
-#### 로그 예시
-```
-[체크포인트 #4] 전투별 데미지 추적 시작 (AAA 패턴)
-  [Arrange] 데미지 추적 환경 준비
-    - 현재까지 총 데미지: 1250
-    - 격파한 적: 1명
-    - 생존 중인 적: 2명
-  [Act] 추가 데미지 발생
-    - 코스트 충전 대기...
-    - 첫 번째 학생 스킬 사용
-    - 발생한 데미지: 500
-  [Assert] 데미지 추적 결과 검증
-    ✓ 최종 총 데미지: 1750 (증가분: +500)
-    ✓ 총 스킬 사용: 4회
-    ✓ 격파한 적: 2명
-    ✓ 학생별 데미지 통계:
-      - 아리스: 1000 데미지
-      - 호시노: 300 데미지
-      - 이로하: 400 데미지
-      - 시로코: 50 데미지
-[체크포인트 #4] ✅ 통과
-```
 
 ---
 
@@ -454,31 +333,6 @@ public class RewardSystem
 - 보상 수량이 0 이하임
 - RewardResultPanel이 생성되지 않음
 
-#### 로그 예시
-```
-[체크포인트 #5] 보상 획득 검증 시작 (AAA 패턴)
-  [Arrange] 보상 계산 준비
-    - 스테이지: Normal 1-4
-    - 총 이동 횟수: 5회
-    - 스킬 사용: 4회
-    - 총 데미지: 1750
-    - 격파한 적: 3명
-  [Act] 전투 완료 및 보상 계산 실행
-    [StageManager] Battle completed! Victory: True
-    [RewardSystem] 보상 계산 완료
-    [StageManager] Stage cleared!
-  [Assert] 보상 획득 결과 검증
-    ✓ 스테이지 상태: StageCleared
-    ✓ 획득한 보상: 5개
-      - 크레딧 x1000
-      - 경험치 x500
-      - 스킬 북 x1
-      - 완벽 클리어 보너스 x200
-      - 전리품 x150
-    ✓ RewardResultPanel 생성 및 표시 완료
-[체크포인트 #5] ✅ 통과
-```
-
 ---
 
 ## 테스트 결과 해석
@@ -536,155 +390,199 @@ UnityTest execution timed out after 300 seconds
 └─────────────────────────────────────┘
 ```
 
-**아이콘 의미**:
-- ⏳ (Pending): 대기 중
-- ▶ (InProgress): 진행 중
-- ✅ (Completed): 완료
-- ❌ (Failed): 실패
+---
+
+## 빌드 및 배포
+
+### 빌드 실행 파일 생성
+
+#### Unity 에디터에서 빌드
+1. **Build Settings 열기**: `File` → `Build Settings`
+2. **씬 추가 확인**: `Scenes/SampleScene`이 리스트에 있고 체크되어 있는지 확인
+3. **플랫폼 선택**: Windows, macOS, Linux 중 선택
+4. **Development Build 활성화** (권장):
+   - `Development Build` 체크
+   - `Script Debugging` 체크
+   - 로그 출력 및 디버깅 가능
+5. **Build 클릭**: 실행 파일 저장 위치 선택
+
+#### 빌드 결과물
+```
+빌드폴더/
+├── NexonGamesProject.exe        # 실행 파일
+├── NexonGamesProject_Data/      # 게임 데이터
+├── MonoBleedingEdge/            # .NET 런타임
+└── UnityPlayer.dll              # Unity 엔진
+```
+
+### 실행 파일 사용법
+
+#### 자동 실행 모드
+1. `NexonGamesProject.exe` 더블 클릭
+2. 자동으로 테스트 시작
+3. TestProgressPanel UI로 진행 상황 확인
+4. 약 30-40초 후 자동 완료
+
+#### 로그 확인
+- **위치**: `%USERPROFILE%\AppData\LocalLow\DefaultCompany\NexonGamesProject\Player.log`
+- **내용**: 모든 체크포인트 결과 및 디버그 로그
 
 ---
 
 ## 문제 해결
 
-### 자주 발생하는 문제
+### 빌드 관련 문제
 
-#### 1. 테스트가 시작되지 않음
-**증상**: Test Runner에서 테스트 목록이 보이지 않음
+#### 문제 1: 빌드 실행 시 UI가 표시되지 않음
 
-**해결방법**:
-1. Unity 재시작
-2. `Assets` → `Reimport All` 실행
-3. Test Runner 창 닫고 다시 열기
-4. `Library` 폴더 삭제 후 프로젝트 다시 열기
+**증상**:
+- 빌드 실행 시 회색 화면만 보임
+- TestProgressPanel이 나타나지 않음
+- Unity Editor에서는 정상 작동
 
-#### 2. 코스트가 회복되지 않음
-**증상**: 스킬 사용 시 코스트 부족 메시지 반복
+**원인**:
+- `NexonGame.Tests.PlayMode` 어셈블리가 `UNITY_INCLUDE_TESTS` 제약으로 빌드에서 제외됨
+- TestVisualizationRunner가 테스트 전용 어셈블리에 위치
 
-**해결방법**:
-1. `CombatSystem.Update(deltaTime)` 호출 확인
-2. `CostSystem.Update(deltaTime)` 호출 확인
-3. `deltaTime` 값이 0이 아닌지 확인
-4. `Time.timeScale`이 0이 아닌지 확인
+**해결 방법**:
+1. **별도 어셈블리 생성**: `NexonGame.Tests.Automation` 어셈블리 신규 생성
+2. **파일 이동**:
+   - `TestVisualizationRunner.cs` → `Assets/_Project/Scripts/Tests/Automation/`
+   - `TestBootstrap.cs` → `Assets/_Project/Scripts/Tests/Automation/`
+3. **네임스페이스 변경**: `NexonGame.Tests.Automation` 사용
+4. **씬 업데이트**: TestRunner GameObject의 TestBootstrap 컴포넌트를 Automation 폴더 것으로 교체
 
-#### 3. 플랫폼을 찾을 수 없음
-**증상**: `[StageManager] 플랫폼을 찾을 수 없음: (x, y)` 메시지
+**확인 방법**:
+```bash
+# 어셈블리 정의 확인
+cat Assets/_Project/Scripts/Tests/Automation/NexonGame.Tests.Automation.asmdef
 
-**해결방법**:
-1. `StageData`의 `platformPositions` 확인
-2. `CreatePlatforms()` 호출 확인
-3. `_platforms` 리스트가 비어있는지 확인
-4. 플랫폼 프리팹 또는 placeholder 생성 확인
+# defineConstraints가 비어있어야 함
+"defineConstraints": []
+```
 
-#### 4. Assert 실패: 데미지가 0임
-**증상**: 스킬은 사용되지만 데미지가 발생하지 않음
+#### 문제 2: Input System 관련 오류
 
-**해결방법**:
-1. `SkillData`의 `baseDamage` 값 확인 (0보다 커야 함)
-2. `damageMultiplier` 값 확인 (0보다 커야 함)
-3. 적의 `CurrentHP` 확인 (0보다 커야 함)
-4. `Enemy.TakeDamage()` 메서드 호출 확인
+**증상**:
+```
+InvalidOperationException: You are trying to read Input using the UnityEngine.Input class,
+but you have switched active Input handling to Input System package in Player Settings.
+```
 
-#### 5. UI 패널이 보이지 않음
-**증상**: 게임 화면이 비어있음
+**원인**:
+- EventSystem에 `StandaloneInputModule` 사용 (Legacy Input System)
+- 프로젝트는 New Input System 사용
 
-**해결방법**:
-1. Canvas의 `renderMode`가 `ScreenSpaceOverlay`인지 확인
-2. `sortingOrder`가 충분히 높은지 확인 (100 이상)
-3. UI 오브젝트가 활성화되어 있는지 확인
-4. `Camera`가 존재하는지 확인 (테스트 씬에 자동 생성됨)
-
-### 로그 레벨 조정
-
-더 상세한 로그를 보려면:
+**해결 방법**:
 ```csharp
-// BlueArchiveIntegrationTests.cs 상단에 추가
-private const bool VERBOSE_LOGGING = true;
+// 수정 전
+eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
 
-// 또는 각 메서드에서
-Debug.Log($"[상세] 현재 코스트: {_combatManager.CurrentCost}");
+// 수정 후
+using UnityEngine.InputSystem.UI;
+eventSystemObj.AddComponent<InputSystemUIInputModule>();
 ```
 
-### 성능 문제
+**어셈블리 참조 추가**:
+```json
+// NexonGame.Tests.Automation.asmdef
+{
+  "references": [
+    "NexonGame.Runtime",
+    "Unity.InputSystem"  // 추가
+  ]
+}
+```
 
-테스트가 너무 느린 경우:
+#### 문제 3: 직렬화 레이아웃 불일치 오류
+
+**증상**:
+```
+A scripted object has a different serialization layout when loading.
+(Read 32 bytes but expected 64 bytes)
+```
+
+**원인**:
+- 씬 파일에 저장된 TestVisualizationRunner의 직렬화 데이터가 코드와 불일치
+- Unity가 씬 파일의 직렬화 데이터를 캐싱
+
+**해결 방법 - TestBootstrap 패턴 사용**:
 ```csharp
-// 대기 시간 줄이기 (테스트용)
-yield return new WaitForSeconds(0.1f); // 원래 0.3f
+// TestBootstrap.cs - 직렬화 필드가 없는 부트스트랩
+public class TestBootstrap : MonoBehaviour
+{
+    private void Awake()
+    {
+        // 런타임에 동적으로 TestVisualizationRunner 생성
+        var testRunnerObj = new GameObject("TestVisualizationRunner");
+        var testRunner = testRunnerObj.AddComponent<TestVisualizationRunner>();
+
+        // Reflection으로 _autoStart 설정
+        var autoStartField = typeof(TestVisualizationRunner).GetField("_autoStart",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        autoStartField?.SetValue(testRunner, true);
+
+        // 부트스트랩 제거
+        Destroy(gameObject);
+    }
+}
 ```
 
-**주의**: 너무 짧게 설정하면 Unity의 프레임 처리가 제대로 되지 않을 수 있습니다.
+**장점**:
+- 씬에는 TestBootstrap만 저장 (직렬화 필드 없음)
+- TestVisualizationRunner는 런타임에 생성 (직렬화 불일치 회피)
+- 빌드 환경과 에디터 환경 모두 동일하게 작동
 
----
+#### 문제 4: NUnit 참조 오류 (빌드 시)
 
-## 추가 테스트
-
-### 단위 테스트
-
-체크포인트 외에도 다음 단위 테스트가 제공됩니다:
-
-#### 플랫폼 클릭 테스트
-```csharp
-// 비인접 플랫폼 클릭 시 이동 실패
-PlatformClick_NonAdjacent_ShouldFail()
-
-// 인접 플랫폼 클릭 시 이동 성공 (8방향)
-PlatformClick_Adjacent8Directions_ShouldSucceed()
-
-// 동일 위치 클릭 시 이동 실패
-PlatformClick_SamePosition_ShouldFail()
+**증상**:
+```
+error CS0246: The type or namespace name 'UnitySetUpAttribute' could not be found
 ```
 
-#### 실행 방법
-Test Runner → PlayMode → `BlueArchiveIntegrationTests` 하위 테스트 개별 실행
+**원인**:
+- `defineConstraints`를 제거하면서 NUnit 테스트 파일들도 빌드에 포함됨
+- 빌드에는 NUnit 프레임워크가 포함되지 않음
 
----
+**해결 방법**:
+1. **어셈블리 분리**:
+   - PlayMode: NUnit 테스트 코드 (`UNITY_INCLUDE_TESTS` 제약 유지)
+   - Automation: 빌드 가능한 자동화 코드 (제약 없음)
 
-## 테스트 결과 리포트
-
-### 테스트 결과 저장
-
-명령줄 실행 시 `TestResults.xml` 파일이 생성됩니다:
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<test-run id="1" testcasecount="4" result="Passed" total="4" passed="4" failed="0">
-  <test-suite type="Assembly" name="NexonGame.Tests.PlayMode">
-    <test-case name="FullIntegration_AllFiveCheckpoints_ShouldPass" result="Passed" duration="35.241" />
-    <test-case name="PlatformClick_NonAdjacent_ShouldFail" result="Passed" duration="0.523" />
-    <test-case name="PlatformClick_Adjacent8Directions_ShouldSucceed" result="Passed" duration="0.487" />
-    <test-case name="PlatformClick_SamePosition_ShouldFail" result="Passed" duration="0.391" />
-  </test-suite>
-</test-run>
+2. **어셈블리 구조**:
+```
+Assets/_Project/Scripts/Tests/
+├── PlayMode/                          # NUnit 테스트 전용
+│   ├── NexonGame.Tests.PlayMode.asmdef
+│   │   └── defineConstraints: ["UNITY_INCLUDE_TESTS"]
+│   ├── StagePlayModeTests.cs
+│   ├── CombatPlayModeTests.cs
+│   └── BlueArchiveIntegrationTests.cs
+│
+└── Automation/                        # 빌드 포함 자동화
+    ├── NexonGame.Tests.Automation.asmdef
+    │   └── defineConstraints: []
+    ├── TestVisualizationRunner.cs
+    └── TestBootstrap.cs
 ```
 
-### CI/CD 통합
+### 실행 관련 문제
 
-Jenkins, GitHub Actions 등에서 사용:
-```yaml
-# .github/workflows/test.yml
-- name: Run Unity Tests
-  run: |
-    unity-editor -runTests -batchmode -projectPath . -testResults results.xml -testPlatform PlayMode
+#### 문제: Development Build 콘솔이 표시되지 않음
 
-- name: Upload Test Results
-  uses: actions/upload-artifact@v2
-  with:
-    name: test-results
-    path: results.xml
-```
+**해결 방법**:
+- Development Build 옵션은 콘솔 창을 자동으로 표시하지 않음
+- 로그 파일 확인: `Player.log` 참조
 
----
+#### 문제: 테스트가 멈춤 (무한 대기)
 
-## 참고 자료
+**원인**:
+- 코스트 회복 시스템이 작동하지 않음
+- 적이 격파되지 않음
 
-- [CODE_GUIDE.md](CODE_GUIDE.md): 코드 작성 가이드 및 패턴
-- [CLAUDE.md](CLAUDE.md): 프로젝트 아키텍처 및 개요
-- [Unity Test Framework 문서](https://docs.unity3d.com/Packages/com.unity.test-framework@latest)
+**해결 방법**:
+1. Player.log 확인
+2. CombatManager의 Update() 메서드 확인
+3. CostSystem.Update() 호출 확인
 
 ---
-
-## 변경 이력
-
-### 2025-12-25
-- 초기 자동화 사용 가이드 작성
-- 5개 체크포인트 상세 설명 추가
-- 문제 해결 섹션 추가
