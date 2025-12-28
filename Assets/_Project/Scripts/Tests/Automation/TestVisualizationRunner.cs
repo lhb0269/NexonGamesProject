@@ -492,12 +492,7 @@ namespace NexonGame.Tests.Automation
             var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
             yield return null;
 
-            string statistics = $"총 이동 횟수: {totalMoves}회\n" +
-                              $"스킬 사용: {totalSkillsUsed}회\n" +
-                              $"총 데미지: {totalDamage}\n" +
-                              $"격파한 적: {enemiesDefeated}명";
-
-            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult, statistics);
+            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult);
             Debug.Log("  ✅ RewardResultPanel 표시 완료");
 
             yield return new WaitForSeconds(1.5f);

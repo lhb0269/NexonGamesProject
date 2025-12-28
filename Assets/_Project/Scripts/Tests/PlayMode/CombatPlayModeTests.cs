@@ -540,10 +540,9 @@ namespace NexonGame.Tests.PlayMode
                 quantity = 5
             });
 
-            string statistics = "이동 횟수: 7회\n스킬 사용: 4회\n총 데미지: 5840";
 
             // Act
-            rewardPanel.ShowRewards("Normal 1-4", rewardResult, statistics);
+            rewardPanel.ShowRewards("Normal 1-4", rewardResult);
             yield return new WaitForSeconds(2f); // [시각화용] 보상 결과 확인
 
             // Assert

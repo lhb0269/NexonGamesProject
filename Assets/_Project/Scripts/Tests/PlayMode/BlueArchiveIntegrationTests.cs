@@ -670,12 +670,7 @@ namespace NexonGame.Tests.PlayMode
             var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
             yield return null;
 
-            string statistics = $"총 이동 횟수: {totalMoves}회\n" +
-                              $"스킬 사용: {totalSkillsUsed}회\n" +
-                              $"총 데미지: {totalDamage}\n" +
-                              $"격파한 적: {enemiesDefeated}명";
-
-            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult, statistics);
+            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult);
 
             // Assert: 보상 패널이 정상적으로 생성되었는지 확인
             Assert.IsNotNull(rewardPanel, "RewardResultPanel이 생성되어야 함");
