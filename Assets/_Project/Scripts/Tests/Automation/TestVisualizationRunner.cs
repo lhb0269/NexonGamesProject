@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem.UI;
 using NexonGame.BlueArchive.Stage;
@@ -7,6 +8,7 @@ using NexonGame.BlueArchive.Combat;
 using NexonGame.BlueArchive.Character;
 using NexonGame.BlueArchive.Data;
 using NexonGame.BlueArchive.UI;
+using NexonGame.BlueArchive.Reward;
 
 namespace NexonGame.Tests.Automation
 {
@@ -473,6 +475,25 @@ namespace NexonGame.Tests.Automation
 
             var result = new CheckpointResult { CheckpointNumber = 5, Name = "보상 획득 검증" };
 
+            // 전투 통계 수집
+            var combatLog = _combatManager.CombatSystem.CombatLog;
+            int totalMoves = _stageManager.TotalMovesInStage;
+            int totalSkillsUsed = combatLog.TotalSkillsUsed;
+            int totalDamage = combatLog.TotalDamageDealt;
+            int enemiesDefeated = combatLog.TotalEnemiesDefeated;
+
+            Debug.Log($"  전투 통계 - 이동: {totalMoves}회, 스킬: {totalSkillsUsed}회, 데미지: {totalDamage}, 격파: {enemiesDefeated}명");
+
+            // 보상 계산
+            var rewardSystem = new RewardSystem();
+            var rewardResult = rewardSystem.CalculateRewards(
+                _testStageData.stageName,
+                totalMoves,
+                combatLog
+            );
+
+            Debug.Log($"  보상 계산 완료 - {rewardResult.GrantedRewards.Count}개 항목");
+
             // 전투 완료
             _stageManager.CompleteBattle(victory: true);
             yield return null;
@@ -481,13 +502,44 @@ namespace NexonGame.Tests.Automation
             _stageManager.ClearStage();
             yield return null;
 
-            // 검증
+            // 검증: 스테이지 상태
             bool stageCleared = _stageManager.CurrentState == StageState.StageCleared;
 
-            result.Passed = stageCleared;
+            // 검증: 보상 결과
+            bool rewardValid = rewardResult != null &&
+                               rewardResult.GrantedRewards.Count > 0 &&
+                               rewardResult.GrantedRewards.All(r => r.quantity > 0);
+
+            Debug.Log($"  스테이지 상태: {_stageManager.CurrentState}");
+            Debug.Log($"  보상 검증: {(rewardValid ? "통과" : "실패")}");
+
+            // 보상 항목 출력
+            foreach (var reward in rewardResult.GrantedRewards)
+            {
+                Debug.Log($"    - {reward.itemName} x{reward.quantity}");
+            }
+
+            // RewardResultPanel 생성 및 표시
+            Debug.Log("  RewardResultPanel 생성 중...");
+            var rewardPanelObj = new GameObject("RewardResultPanel");
+            var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
+            yield return null;
+
+            string statistics = $"총 이동 횟수: {totalMoves}회\n" +
+                              $"스킬 사용: {totalSkillsUsed}회\n" +
+                              $"총 데미지: {totalDamage}\n" +
+                              $"격파한 적: {enemiesDefeated}명";
+
+            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult, statistics);
+            Debug.Log("  ✅ RewardResultPanel 표시 완료");
+
+            yield return new WaitForSeconds(2f); // 보상 패널 표시 시간
+
+            // 최종 검증
+            result.Passed = stageCleared && rewardValid && rewardPanel != null;
             result.Message = result.Passed
-                ? $"✅ 성공 - 스테이지 클리어: {_stageManager.CurrentState}"
-                : $"❌ 실패 - 스테이지 상태 오류";
+                ? $"✅ 성공 - 스테이지 클리어, 보상 {rewardResult.GrantedRewards.Count}개 획득, 패널 표시"
+                : $"❌ 실패 - 스테이지 상태: {stageCleared}, 보상: {rewardValid}, 패널: {(rewardPanel != null)}";
 
             Debug.Log($"[체크포인트 #5] {result.Message}");
 
