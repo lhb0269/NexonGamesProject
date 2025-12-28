@@ -25,7 +25,6 @@ namespace NexonGame.BlueArchive.UI
         private Text _titleText;
         private Text _stageNameText;
         private Transform _rewardListContainer;
-        private Text _statisticsText;
         private List<GameObject> _rewardEntries;
 
         private const float PANEL_WIDTH = 600f;
@@ -143,29 +142,6 @@ namespace NexonGame.BlueArchive.UI
             statsLabelRect.sizeDelta = new Vector2(PANEL_WIDTH - 40, 30);
             statsLabelRect.anchoredPosition = new Vector2(0, -PANEL_HEIGHT / 2 + 140);
 
-            var statsLabel = statsLabelObj.AddComponent<Text>();
-            statsLabel.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            statsLabel.fontSize = 18;
-            statsLabel.alignment = TextAnchor.MiddleLeft;
-            statsLabel.color = new Color(0.9f, 0.9f, 1f);
-            statsLabel.text = "  전투 통계:";
-            statsLabel.fontStyle = FontStyle.Bold;
-
-            // 통계 텍스트
-            var statsTextObj = new GameObject("StatsText");
-            statsTextObj.transform.SetParent(_panelRoot.transform, false);
-
-            var statsTextRect = statsTextObj.AddComponent<RectTransform>();
-            statsTextRect.sizeDelta = new Vector2(PANEL_WIDTH - 60, 80);
-            statsTextRect.anchoredPosition = new Vector2(0, -PANEL_HEIGHT / 2 + 70);
-
-            _statisticsText = statsTextObj.AddComponent<Text>();
-            _statisticsText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            _statisticsText.fontSize = 14;
-            _statisticsText.alignment = TextAnchor.UpperLeft;
-            _statisticsText.color = _statsColor;
-            _statisticsText.text = "";
-
             Debug.Log("[RewardResultPanel] UI 생성 완료");
         }
 
@@ -200,7 +176,7 @@ namespace NexonGame.BlueArchive.UI
         /// <summary>
         /// 보상 결과 표시
         /// </summary>
-        public void ShowRewards(string stageName, RewardGrantResult rewardResult, string statistics)
+        public void ShowRewards(string stageName, RewardGrantResult rewardResult)
         {
             // 스테이지 이름 설정
             _stageNameText.text = stageName;
@@ -214,9 +190,6 @@ namespace NexonGame.BlueArchive.UI
                 var reward = rewardResult.GrantedRewards[i];
                 CreateRewardEntry(reward, i);
             }
-
-            // 통계 설정
-            _statisticsText.text = statistics;
 
             // 패널 표시
             ShowPanel();
@@ -346,7 +319,6 @@ namespace NexonGame.BlueArchive.UI
         {
             ClearRewardEntries();
             _stageNameText.text = "";
-            _statisticsText.text = "";
             HidePanel();
 
             Debug.Log("[RewardResultPanel] 패널 초기화");

@@ -145,7 +145,10 @@ namespace NexonGame.BlueArchive.Reward
         /// <summary>
         /// 개별 보상 지급
         /// </summary>
-        private void GrantReward(RewardItemData reward)
+        /// <summary>
+        /// 보상 지급 (public - TestVisualizationRunner에서 사용)
+        /// </summary>
+        public void GrantReward(RewardItemData reward)
         {
             // 인벤토리에 추가
             _inventory[reward.itemType] += reward.quantity;

@@ -144,6 +144,15 @@ namespace NexonGame.Tests.Automation
                 new Vector2Int(2, 1)
             };
 
+            // 보상 데이터 생성 (RewardValidator 검증을 위해 필요)
+            _testStageData.rewards = new List<RewardItemData>
+            {
+                CreateRewardItem("크레딧", RewardItemType.Currency, 1000),
+                CreateRewardItem("노트", RewardItemType.Material, 5),
+                CreateRewardItem("T1 가방", RewardItemType.Equipment, 1),
+                CreateRewardItem("전술 EXP", RewardItemType.Exp, 150)
+            };
+
             // 학생 데이터 생성
             _testStudents = CreateTestStudents();
 
@@ -153,79 +162,37 @@ namespace NexonGame.Tests.Automation
             Debug.Log($"[TestData] 스테이지: {_testStageData.stageName}");
             Debug.Log($"[TestData] 학생: {_testStudents.Count}명");
             Debug.Log($"[TestData] 적: {_testEnemies.Count}명");
+            Debug.Log($"[TestData] 보상: {_testStageData.rewards.Count}개");
         }
 
         /// <summary>
-        /// 테스트용 학생 데이터 생성
+        /// 보상 아이템 생성 헬퍼
+        /// </summary>
+        private RewardItemData CreateRewardItem(string name, RewardItemType type, int quantity)
+        {
+            var reward = ScriptableObject.CreateInstance<RewardItemData>();
+            reward.itemName = name;
+            reward.itemType = type;
+            reward.quantity = quantity;
+            return reward;
+        }
+
+        /// <summary>
+        /// 테스트용 학생 데이터 생성 (StudentPresets 사용)
         /// </summary>
         private List<StudentData> CreateTestStudents()
         {
-            var students = new List<StudentData>();
-
-            // 아리스
-            var arisu = ScriptableObject.CreateInstance<StudentData>();
-            arisu.studentName = "아리스";
-            arisu.maxHP = 1000;
-            arisu.attack = 100;
-            arisu.exSkill = CreateSkill("EX: 정의의 일격", 500, 1f, 20f, SkillTargetType.Single, 4);
-            students.Add(arisu);
-
-            // 호시노
-            var hoshino = ScriptableObject.CreateInstance<StudentData>();
-            hoshino.studentName = "호시노";
-            hoshino.maxHP = 1200;
-            hoshino.attack = 80;
-            hoshino.exSkill = CreateSkill("EX: 수호의 맹세", 300, 1f, 25f, SkillTargetType.Multiple, 5);
-            students.Add(hoshino);
-
-            // 이로하
-            var iroha = ScriptableObject.CreateInstance<StudentData>();
-            iroha.studentName = "이로하";
-            iroha.maxHP = 900;
-            iroha.attack = 120;
-            iroha.exSkill = CreateSkill("EX: 신속한 사격", 400, 1f, 15f, SkillTargetType.Single, 3);
-            students.Add(iroha);
-
-            // 시로코
-            var shiroko = ScriptableObject.CreateInstance<StudentData>();
-            shiroko.studentName = "시로코";
-            shiroko.maxHP = 950;
-            shiroko.attack = 110;
-            shiroko.exSkill = CreateSkill("EX: 전술 지원", 350, 1f, 20f, SkillTargetType.Area, 4);
-            students.Add(shiroko);
-
-            return students;
+            // StudentPresets에서 정의된 학생 데이터 사용
+            return StudentPresets.CreateAllStudents();
         }
 
         /// <summary>
-        /// 테스트용 스킬 데이터 생성
-        /// </summary>
-        private SkillData CreateSkill(string name, int damage, float multiplier, float cooldown, SkillTargetType targetType, int cost)
-        {
-            var skill = ScriptableObject.CreateInstance<SkillData>();
-            skill.skillName = name;
-            skill.baseDamage = damage;
-            skill.damageMultiplier = multiplier;
-            skill.cooldownTime = cooldown;
-            skill.targetType = targetType;
-            skill.costAmount = cost;
-            return skill;
-        }
-
-        /// <summary>
-        /// 테스트용 적 데이터 생성
+        /// 테스트용 적 데이터 생성 (StudentPresets 사용)
         /// </summary>
         private List<EnemyData> CreateTestEnemies()
         {
-            var enemies = new List<EnemyData>();
-
-            for (int i = 0; i < 3; i++)
-            {
-                var enemy = new EnemyData($"일반병{i + 1}", 500, 50, 20);
-                enemies.Add(enemy);
-            }
-
-            return enemies;
+            // StudentPresets에서 정의된 Normal 1-4 적 데이터 사용
+            return StudentPresets.CreateNormal1_4Enemies();
         }
 
         /// <summary>
@@ -464,7 +431,7 @@ namespace NexonGame.Tests.Automation
         }
 
         /// <summary>
-        /// 체크포인트 #5: 보상 획득 검증
+        /// 체크포인트 #5: 보상 획득 검증 (인벤토리 + 검증)
         /// </summary>
         private IEnumerator RunCheckpoint5_RewardVerification()
         {
@@ -519,27 +486,86 @@ namespace NexonGame.Tests.Automation
                 Debug.Log($"    - {reward.itemName} x{reward.quantity}");
             }
 
-            // RewardResultPanel 생성 및 표시
-            Debug.Log("  RewardResultPanel 생성 중...");
+            // === 1단계: RewardResultPanel 생성 및 표시 ===
+            Debug.Log("  [1/4] RewardResultPanel 생성 중...");
             var rewardPanelObj = new GameObject("RewardResultPanel");
             var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
             yield return null;
 
-            string statistics = $"총 이동 횟수: {totalMoves}회\n" +
-                              $"스킬 사용: {totalSkillsUsed}회\n" +
-                              $"총 데미지: {totalDamage}\n" +
-                              $"격파한 적: {enemiesDefeated}명";
-
-            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult, statistics);
+            rewardPanel.ShowRewards(_testStageData.stageName, rewardResult);
             Debug.Log("  ✅ RewardResultPanel 표시 완료");
 
-            yield return new WaitForSeconds(2f); // 보상 패널 표시 시간
+            yield return new WaitForSeconds(1.5f);
 
-            // 최종 검증
-            result.Passed = stageCleared && rewardValid && rewardPanel != null;
+            // === 2단계: InventoryPanel 생성 및 초기화 ===
+            Debug.Log("  [2/4] InventoryPanel 생성 중...");
+            var inventoryPanelObj = new GameObject("InventoryPanel");
+            var inventoryPanel = inventoryPanelObj.AddComponent<InventoryPanel>();
+            inventoryPanel.Initialize(rewardSystem);
+            Debug.Log("  ✅ InventoryPanel 생성 완료");
+
+            yield return new WaitForSeconds(0.5f);
+
+            // === 3단계: 보상을 하나씩 인벤토리에 추가 (애니메이션 포함) ===
+            Debug.Log("  [3/4] 보상을 인벤토리에 추가 중...");
+            _testProgressPanel.UpdateMessage("보상을 인벤토리에 추가 중...");
+
+            foreach (var reward in rewardResult.GrantedRewards)
+            {
+                Debug.Log($"    인벤토리에 추가: {reward.itemName} x{reward.quantity}");
+                rewardSystem.GrantReward(reward); // 이벤트 발생 → InventoryPanel 업데이트
+                yield return new WaitForSeconds(0.4f); // 애니메이션 대기
+            }
+
+            Debug.Log("  ✅ 모든 보상 인벤토리 추가 완료");
+
+            yield return new WaitForSeconds(1f);
+
+            // === 4단계: 검증 수행 및 ValidationResultPanel 표시 ===
+            Debug.Log("  [4/4] 보상 검증 수행 중...");
+            _testProgressPanel.UpdateMessage("보상 검증 중...");
+
+            var rewardValidator = new RewardValidator(rewardSystem);
+
+            // CombatResult 생성 (검증을 위해 필요)
+            var combatResult = new CombatResult
+            {
+                State = CombatState.Victory
+            };
+
+            var validationResult = rewardValidator.ValidateRewardGrant(_testStageData, rewardResult);
+
+            Debug.Log($"  검증 결과: {(validationResult.IsValid ? "성공" : "실패")}");
+            if (!validationResult.IsValid)
+            {
+                Debug.LogWarning($"  검증 실패 이유: {validationResult.FailureReason}");
+                foreach (var error in validationResult.ValidationErrors)
+                {
+                    Debug.LogWarning($"    - {error}");
+                }
+            }
+
+            // ValidationResultPanel 생성
+            var validationPanelObj = new GameObject("ValidationResultPanel");
+            var validationPanel = validationPanelObj.AddComponent<ValidationResultPanel>();
+            validationPanel.ShowValidationResult(
+                validationResult,
+                rewardResult,
+                inventoryPanel.GetInventoryData()
+            );
+            Debug.Log("  ✅ ValidationResultPanel 표시 완료");
+
+            yield return new WaitForSeconds(3f); // 검증 결과 확인 시간
+
+            // === 최종 검증 ===
+            bool inventoryValid = inventoryPanel != null && inventoryPanel.GetInventoryData() != null;
+            bool allValid = stageCleared && rewardValid && rewardPanel != null &&
+                           inventoryValid && validationResult.IsValid;
+
+            result.Passed = allValid;
             result.Message = result.Passed
-                ? $"✅ 성공 - 스테이지 클리어, 보상 {rewardResult.GrantedRewards.Count}개 획득, 패널 표시"
-                : $"❌ 실패 - 스테이지 상태: {stageCleared}, 보상: {rewardValid}, 패널: {(rewardPanel != null)}";
+                ? $"✅ 성공 - 스테이지 클리어, 보상 {rewardResult.GrantedRewards.Count}개 획득, 인벤토리 추가 및 검증 완료"
+                : $"❌ 실패 - 스테이지: {stageCleared}, 보상: {rewardValid}, 인벤토리: {inventoryValid}, 검증: {validationResult.IsValid}";
 
             Debug.Log($"[체크포인트 #5] {result.Message}");
 
