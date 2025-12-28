@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using NexonGame.BlueArchive.Data;
+using NexonGame.BlueArchive.Utilities;
 
 namespace NexonGame.BlueArchive.Stage
 {
@@ -163,7 +164,10 @@ namespace NexonGame.BlueArchive.Stage
         /// </summary>
         private void CreatePlaceholderPlatform(Vector2Int gridPos, PlatformType type)
         {
-            GameObject platformObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject platformObj = URPMaterialHelper.CreatePrimitiveWithURPMaterial(
+                PrimitiveType.Cube,
+                Color.gray
+            );
             platformObj.name = $"Platform_{gridPos.x}_{gridPos.y}";
             platformObj.transform.SetParent(_platformContainer);
             platformObj.transform.position = GridToWorldPosition(gridPos);
@@ -191,7 +195,10 @@ namespace NexonGame.BlueArchive.Stage
             else
             {
                 // Placeholder 마커
-                _playerMarker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                _playerMarker = URPMaterialHelper.CreatePrimitiveWithURPMaterial(
+                    PrimitiveType.Sphere,
+                    Color.cyan
+                );
                 _playerMarker.name = "PlayerMarker";
                 _playerMarker.transform.SetParent(transform);
                 _playerMarker.transform.localScale = Vector3.one * 0.5f;

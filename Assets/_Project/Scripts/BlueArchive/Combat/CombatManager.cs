@@ -4,6 +4,7 @@ using NexonGame.BlueArchive.Character;
 using NexonGame.BlueArchive.Data;
 using NexonGame.BlueArchive.Skill;
 using NexonGame.BlueArchive.UI;
+using NexonGame.BlueArchive.Utilities;
 
 namespace NexonGame.BlueArchive.Combat
 {
@@ -167,7 +168,10 @@ namespace NexonGame.BlueArchive.Combat
             else
             {
                 // Placeholder
-                obj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                obj = URPMaterialHelper.CreatePrimitiveWithURPMaterial(
+                    PrimitiveType.Capsule,
+                    Color.blue
+                );
                 obj.transform.SetParent(_studentContainer);
                 obj.transform.position = position;
                 obj.transform.localScale = new Vector3(0.5f, 1f, 0.5f);
@@ -199,7 +203,10 @@ namespace NexonGame.BlueArchive.Combat
             else
             {
                 // Placeholder
-                obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                obj = URPMaterialHelper.CreatePrimitiveWithURPMaterial(
+                    PrimitiveType.Cube,
+                    Color.red
+                );
                 obj.transform.SetParent(_enemyContainer);
                 obj.transform.position = position;
                 obj.transform.localScale = new Vector3(0.8f, 1.2f, 0.8f);
