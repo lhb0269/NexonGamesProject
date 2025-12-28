@@ -243,6 +243,7 @@ namespace NexonGame.Tests.Automation
 
             var panelObj = new GameObject("TestProgressPanel");
             panelObj.transform.SetParent(canvas.transform, false);
+            panelObj.transform.localPosition = new Vector3(0, 400, 0);
 
             _testProgressPanel = panelObj.AddComponent<TestProgressPanel>();
             // Awake()에서 자동으로 UI 생성됨
@@ -304,6 +305,7 @@ namespace NexonGame.Tests.Automation
 
             if (result.Passed) _passedTests++;
             else _failedTests++;
+            _stageManager.transform.localPosition= new Vector3(0, -1000, 0);  // 화면 밖으로 이동
 
             yield return null;
         }
