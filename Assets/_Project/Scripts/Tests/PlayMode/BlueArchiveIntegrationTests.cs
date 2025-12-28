@@ -104,95 +104,30 @@ namespace NexonGame.Tests.PlayMode
         }
 
         /// <summary>
-        /// 테스트용 학생 데이터 생성
+        /// 테스트용 학생 데이터 생성 (StudentPresets 사용)
         /// </summary>
         private List<StudentData> CreateTestStudents()
         {
-            var students = new List<StudentData>();
-
-            // Shiroko
-            var shirokoSkill = ScriptableObject.CreateInstance<SkillData>();
-            shirokoSkill.skillName = "EX - 목표 사격";
-            shirokoSkill.costAmount = 3;
-            shirokoSkill.cooldownTime = 20f;
-            shirokoSkill.baseDamage = 1250;
-            shirokoSkill.targetType = SkillTargetType.Single;
-
-            var shiroko = ScriptableObject.CreateInstance<StudentData>();
-            shiroko.studentName = "Shiroko";
-            shiroko.maxHP = 2431;
-            shiroko.exSkill = shirokoSkill;
-            students.Add(shiroko);
-
-            // Hoshino
-            var hoshinoSkill = ScriptableObject.CreateInstance<SkillData>();
-            hoshinoSkill.skillName = "EX - 방패 전개";
-            hoshinoSkill.costAmount = 2;
-            hoshinoSkill.cooldownTime = 15f;
-            hoshinoSkill.baseDamage = 800;
-            hoshinoSkill.targetType = SkillTargetType.Single;
-
-            var hoshino = ScriptableObject.CreateInstance<StudentData>();
-            hoshino.studentName = "Hoshino";
-            hoshino.maxHP = 3512;
-            hoshino.exSkill = hoshinoSkill;
-            students.Add(hoshino);
-
-            // Aru
-            var aruSkill = ScriptableObject.CreateInstance<SkillData>();
-            aruSkill.skillName = "EX - 섬광탄";
-            aruSkill.costAmount = 4;
-            aruSkill.cooldownTime = 25f;
-            aruSkill.baseDamage = 1500;
-            aruSkill.targetType = SkillTargetType.Multiple;
-
-            var aru = ScriptableObject.CreateInstance<StudentData>();
-            aru.studentName = "Aru";
-            aru.maxHP = 2187;
-            aru.exSkill = aruSkill;
-            students.Add(aru);
-
-            // Haruna
-            var harunaSkill = ScriptableObject.CreateInstance<SkillData>();
-            harunaSkill.skillName = "EX - 집중 사격";
-            harunaSkill.costAmount = 5;
-            harunaSkill.cooldownTime = 30f;
-            harunaSkill.baseDamage = 2100;
-            harunaSkill.targetType = SkillTargetType.Single;
-
-            var haruna = ScriptableObject.CreateInstance<StudentData>();
-            haruna.studentName = "Haruna";
-            haruna.maxHP = 2089;
-            haruna.exSkill = harunaSkill;
-            students.Add(haruna);
-
-            return students;
+            // StudentPresets에서 정의된 학생 데이터 사용
+            return StudentPresets.CreateAllStudents();
         }
 
         /// <summary>
-        /// 테스트용 적 데이터 생성
+        /// 테스트용 적 데이터 생성 (StudentPresets 사용)
         /// </summary>
         private List<EnemyData> CreateTestEnemies()
         {
-            var enemies = new List<EnemyData>();
-
-            enemies.Add(new EnemyData("일반병 A", 1200, 50, 20));
-            enemies.Add(new EnemyData("일반병 B", 1200, 50, 20));
-            enemies.Add(new EnemyData("정예병", 2500, 80, 30));
-
-            return enemies;
+            // StudentPresets에서 정의된 Normal 1-4 적 데이터 사용
+            return StudentPresets.CreateNormal1_4Enemies();
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
-            // StudentData는 ScriptableObject이므로 파괴 필요
-            foreach (var student in _testStudents)
+            // StudentData 정리 (StudentPresets 사용)
+            if (_testStudents != null)
             {
-                if (student != null)
-                {
-                    Object.DestroyImmediate(student);
-                }
+                StudentPresets.DestroyAllStudents(_testStudents);
             }
 
             // 테스트 데이터 정리
@@ -655,12 +590,12 @@ namespace NexonGame.Tests.PlayMode
         }
 
         /// <summary>
-        /// 체크포인트 #5: 보상 획득 검증
+        /// 체크포인트 #5: 보상 획득 검증 (인벤토리 + 검증 통합)
         /// AAA 패턴 적용: Arrange - Act - Assert
         /// </summary>
         private IEnumerator CheckpointFive_RewardVerification()
         {
-            Debug.Log("\n[체크포인트 #5] 보상 획득 검증 시작 (AAA 패턴)");
+            Debug.Log("\n[체크포인트 #5] 보상 획득 검증 시작 (AAA 패턴 + 인벤토리)");
             _testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.InProgress);
             _testProgressPanel.UpdateMessage("보상 검증 중...");
 
@@ -702,9 +637,9 @@ namespace NexonGame.Tests.PlayMode
             yield return null;
 
             // ========================================
-            // Assert: 보상 및 상태 검증
+            // Assert: 보상 및 상태 검증 (1단계)
             // ========================================
-            Debug.Log("  [Assert] 보상 획득 결과 검증");
+            Debug.Log("  [Assert - 1단계] 기본 보상 검증");
 
             // 스테이지 상태가 클리어로 변경되었는지 확인
             Assert.AreEqual(StageState.StageCleared, _stageManager.CurrentState,
@@ -729,8 +664,8 @@ namespace NexonGame.Tests.PlayMode
                 Debug.Log($"      - {reward.itemName} x{reward.quantity}");
             }
 
-            // RewardResultPanel 표시 테스트
-            Debug.Log("    ✓ 보상 패널 표시 테스트");
+            // === 1단계: RewardResultPanel 생성 및 표시 ===
+            Debug.Log("  [1/4] RewardResultPanel 생성 중...");
             var rewardPanelObj = new GameObject("RewardResultPanel");
             var rewardPanel = rewardPanelObj.AddComponent<RewardResultPanel>();
             yield return null;
@@ -742,17 +677,110 @@ namespace NexonGame.Tests.PlayMode
 
             rewardPanel.ShowRewards(_testStageData.stageName, rewardResult, statistics);
 
-            // 보상 패널이 정상적으로 생성되었는지 확인
+            // Assert: 보상 패널이 정상적으로 생성되었는지 확인
             Assert.IsNotNull(rewardPanel, "RewardResultPanel이 생성되어야 함");
+            Debug.Log("  ✅ RewardResultPanel 표시 완료");
 
-            Debug.Log($"    ✓ RewardResultPanel 생성 및 표시 완료");
+            yield return new WaitForSeconds(1.5f);
+
+            // === 2단계: InventoryPanel 생성 및 초기화 ===
+            Debug.Log("  [2/4] InventoryPanel 생성 중...");
+            var inventoryPanelObj = new GameObject("InventoryPanel");
+            var inventoryPanel = inventoryPanelObj.AddComponent<InventoryPanel>();
+            inventoryPanel.Initialize(_rewardSystem);
+
+            // Assert: 인벤토리 패널 생성 확인
+            Assert.IsNotNull(inventoryPanel, "InventoryPanel이 생성되어야 함");
+            Debug.Log("  ✅ InventoryPanel 생성 완료");
+
+            yield return new WaitForSeconds(0.5f);
+
+            // === 3단계: 보상을 하나씩 인벤토리에 추가 (애니메이션 포함) ===
+            Debug.Log("  [3/4] 보상을 인벤토리에 추가 중...");
+            _testProgressPanel.UpdateMessage("보상을 인벤토리에 추가 중...");
+
+            int rewardsGranted = 0;
+            foreach (var reward in rewardResult.GrantedRewards)
+            {
+                Debug.Log($"    인벤토리에 추가: {reward.itemName} x{reward.quantity}");
+                _rewardSystem.GrantReward(reward); // 이벤트 발생 → InventoryPanel 업데이트
+                rewardsGranted++;
+                yield return new WaitForSeconds(0.4f);
+            }
+
+            // Assert: 모든 보상이 추가되었는지 확인
+            Assert.AreEqual(rewardResult.GrantedRewards.Count, rewardsGranted,
+                "모든 보상이 인벤토리에 추가되어야 함");
+            Debug.Log($"  ✅ 모든 보상 인벤토리 추가 완료 ({rewardsGranted}개)");
+
+            yield return new WaitForSeconds(1f);
+
+            // === 4단계: 검증 수행 및 ValidationResultPanel 표시 ===
+            Debug.Log("  [4/4] 보상 검증 수행 중...");
+            _testProgressPanel.UpdateMessage("보상 검증 중...");
+
+            var rewardValidator = new RewardValidator(_rewardSystem);
+            var validationResult = rewardValidator.ValidateRewardGrant(_testStageData, rewardResult);
+
+            // Assert: 검증 결과 확인
+            Assert.IsNotNull(validationResult, "검증 결과가 null이 아니어야 함");
+            Assert.IsTrue(validationResult.IsValid,
+                $"검증이 성공해야 함 - 실패 이유: {validationResult.FailureReason}");
+
+            Debug.Log($"  검증 결과: {(validationResult.IsValid ? "성공" : "실패")}");
+            if (!validationResult.IsValid)
+            {
+                Debug.LogWarning($"  검증 실패 이유: {validationResult.FailureReason}");
+                foreach (var error in validationResult.ValidationErrors)
+                {
+                    Debug.LogWarning($"    - {error}");
+                }
+            }
+
+            // ValidationResultPanel 생성
+            var validationPanelObj = new GameObject("ValidationResultPanel");
+            var validationPanel = validationPanelObj.AddComponent<ValidationResultPanel>();
+
+            var inventoryData = inventoryPanel.GetInventoryData();
+            Assert.IsNotNull(inventoryData, "인벤토리 데이터가 null이 아니어야 함");
+
+            validationPanel.ShowValidationResult(
+                validationResult,
+                rewardResult,
+                inventoryData
+            );
+
+            // Assert: 검증 패널 생성 확인
+            Assert.IsNotNull(validationPanel, "ValidationResultPanel이 생성되어야 함");
+            Debug.Log("  ✅ ValidationResultPanel 표시 완료");
 
             yield return new WaitForSeconds(3f);
 
-            Debug.Log("[체크포인트 #5] ✅ 통과");
+            // ========================================
+            // Assert: 최종 검증 (2단계)
+            // ========================================
+            Debug.Log("  [Assert - 2단계] 최종 검증");
+
+            // 인벤토리 데이터 존재 확인
+            Assert.Greater(inventoryData.Count, 0, "인벤토리에 아이템이 있어야 함");
+
+            // 모든 보상이 인벤토리에 정확히 추가되었는지 확인
+            foreach (var reward in rewardResult.GrantedRewards)
+            {
+                Assert.IsTrue(inventoryData.ContainsKey(reward.itemType),
+                    $"인벤토리에 {reward.itemType} 타입이 있어야 함");
+
+                int inventoryQuantity = inventoryData[reward.itemType];
+                Assert.AreEqual(reward.quantity, inventoryQuantity,
+                    $"{reward.itemName}: 예상 {reward.quantity}, 실제 {inventoryQuantity}");
+
+                Debug.Log($"    ✓ {reward.itemName}: {inventoryQuantity}/{reward.quantity} (일치)");
+            }
+
+            Debug.Log("[체크포인트 #5] ✅ 통과 - 보상, 인벤토리, 검증 모두 완료");
 
             _testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.Completed);
-            _testProgressPanel.UpdateMessage("보상 획득 완료!");
+            _testProgressPanel.UpdateMessage("보상 획득 및 검증 완료!");
             yield return new WaitForSeconds(1f);
             yield return null;
         }
