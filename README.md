@@ -40,15 +40,15 @@
 ```
 [Setup] 초기화
     ↓
-[#1] 발판 이동 (3회 이동)
+[#1] 발판 이동
     ↓
-[#2] 전투 진입 (학생 4명, 적 2명)
+[#2] 전투 진입
     ↓
-[#3] EX 스킬 사용 (4명 x 1회)
+[#3] EX 스킬 사용
     ↓
-[#4] 코스트/데미지 기록 (16 코스트, 1250 데미지)
+[#4] 코스트/데미지 기록
     ↓
-[#5] 보상 획득 (4개 보상, 인벤토리 추가, 검증)
+[#5] 보상 획득 (인벤토리 추가, 검증)
     ↓
 [Result] 최종 결과 표시
 ```
@@ -65,7 +65,7 @@
 1. StageManager 초기화 및 스테이지 로드
 2. 시작 위치(0, 0)에서 전투 위치(3, 1)까지 이동 시뮬레이션
 3. 각 이동마다 `StageManager.MoveToPosition()` 호출
-4. 이동 경로: (0,0) → (1,1) → (2,1) → (3,1)
+4. 이동 경로: (0,0) → (1,1) → (0,2) → (1,1) → (2,1) → (3,1)
 
 #### 검증 항목
 - ✅ `_stageManager.CurrentPosition == battlePosition` (최종 위치 도달)
@@ -91,13 +91,13 @@
 1. CombatManager 초기화
 2. `_combatManager.SetupCombat()` 호출로 전투 준비
 3. `_stageManager.EnterBattle()` 호출로 전투 진입
-4. 학생 4명, 적 2명 배치
+4. 학생 4명, 적 3명 배치
 
 #### 검증 항목
 - ✅ `_stageManager.CurrentState == StageState.InBattle` (전투 상태 전환)
 - ✅ `_combatManager.CombatSystem.CurrentState == CombatState.InProgress` (전투 시작)
 - ✅ 학생 4명 활성화
-- ✅ 적 2명 배치
+- ✅ 적 3명 배치
 
 #### 전투 초기화 과정
 ```
@@ -134,12 +134,17 @@
 - ✅ 스킬별 실행 로그 출력 (이름, 데미지, 코스트)
 
 #### 학생별 스킬 데이터
-| 학생 이름 | 스킬 이름 | 데미지 | 코스트 | 쿨타임 |
-|---------|---------|-------|-------|-------|
-| 아리스 | EX: 정의의 일격 | 500 | 4 | 20초 |
-| 호시노 | EX: 방패의 의지 | 300 | 3 | 25초 |
-| 이로하 | EX: 치유의 기도 | 0 | 5 | 15초 |
-| 시로코 | EX: 폭풍의 일격 | 450 | 4 | 20초 |
+| 학생 이름 | HP | ATK | DEF | 스킬 이름 | 스킬 데미지 | 타겟 | 코스트 | 쿨타임 |
+|---------|-----|-----|-----|---------|------------|------|-------|-------|
+| Shiroko | 2492 | 340 | 19 | 드론 소환: 화력 지원 | 720 (400 × 1.8) | Single | 2 | 20초 |
+| Hoshino | 3275 | 213 | 175 | 전술 진압 | 653 (435 × 1.5) | Single | 4 | 25초 |
+| Aru | 2505 | 451 | 19 | 하드보일드 샷 | 548 (274 × 2.0) | Multiple | 4 | 22초 |
+| Haruna | 2451 | 457 | 19 | 꿰뚫는 엘레강스 | 1265 (506 × 2.5) | Single | 4 | 30초 |
+
+**적 데이터** (Normal 1-4):
+- 일반병 A: HP 800, ATK 45, **DEF 15**
+- 일반병 B: HP 800, ATK 45, **DEF 15**
+- 정예병: HP 1200, ATK 60, **DEF 20**
 
 #### 스킬 실행 프로세스
 ```
@@ -149,13 +154,18 @@
    - 쿨타임 시작 (Student.UseSkill)
    - 로그 기록 (CombatLog.LogSkillUsed)
 3. 데미지 계산:
+   - 기본 데미지 계산: baseDamage × damageMultiplier
    - 대상 선택 (Single/Multiple/Area)
+   - 방어력 적용: actualDamage = Max(1, skillDamage - enemyDef)
    - 데미지 적용 (Enemy.TakeDamage)
    - 로그 기록 (CombatLog.LogDamageDealt)
 4. 격파 확인:
    - 적 HP ≤ 0 → 격파
    - 로그 기록 (CombatLog.LogUnitDefeated)
 ```
+
+**예시**: Shiroko의 스킬(720 데미지)을 일반병 A(DEF 15)에게 사용
+- 실제 데미지 = 720 - 15 = **705**
 
 #### 성공 조건
 4명의 학생이 모두 EX 스킬을 성공적으로 실행
@@ -179,16 +189,38 @@
 
 #### 검증 항목
 - ✅ 총 스킬 사용 횟수: `combatLog.TotalSkillsUsed == 4`
-- ✅ 총 코스트 소모: `combatLog.TotalCostUsed == 16` (4+3+5+4)
-- ✅ 총 데미지: `combatLog.TotalDamageDealt == 1250` (500+300+0+450)
+- ✅ 총 코스트 소모: `combatLog.TotalCostUsed == 14` (2+4+4+4)
+- ✅ 총 데미지: 방어력 적용 후 실제 데미지 (동적 계산)
 - ✅ 각 학생별 데미지 기록 존재
 
 #### 데미지 기록 형식
 ```
-아리스: 500 데미지 (코스트 4)
-호시노: 300 데미지 (코스트 3)
-이로하: 0 데미지 (코스트 5)
-시로코: 450 데미지 (코스트 4)
+스킬 데미지 계산 공식:
+- 기본 데미지: baseDamage × damageMultiplier
+- 실제 데미지: Max(1, 기본 데미지 - 적 방어력)
+
+학생별 스킬 데미지 (방어력 적용 전):
+- Shiroko: 720 (400 × 1.8)
+- Hoshino: 652 (435 × 1.5)
+- Aru: 548 (274 × 2.0) × 타겟 수 (Multiple)
+- Haruna: 1265 (506 × 2.5)
+
+적 방어력:
+- 일반병 A/B: DEF 15
+- 정예병: DEF 20
+
+실제 전투 시나리오 (테스트 결과):
+1. Shiroko → 일반병 타겟: 720 - 15 = 705 데미지
+2. Hoshino → 일반병 타겟: 652 - 15 = 637 데미지
+3. Aru → Multiple 타겟 (살아있는 적 대상):
+   - 일반병: 548 - 15 = 533 데미지
+   - 정예병: 548 - 20 = 528 데미지
+   - 총 데미지: 1061 (타겟 수에 따라 변동)
+4. Haruna → 타겟: 1250 데미지 (1265 - 15 or 1265 - 20)
+
+총 데미지: 약 3653 (전투 상황에 따라 변동)
+
+※ 실제 데미지는 스킬 사용 순서, 적 격파 타이밍에 따라 달라질 수 있습니다.
 ```
 
 #### 데미지 추적 시스템
@@ -252,16 +284,16 @@ public void LogDamageDealt(string actorName, string targetName, int damage)
 - ✅ **예상 vs 실제 일치**: `validationResult.IsValid`
 
 #### 예상 보상 (StageData.rewards)
-1. **크레딧** (Currency) x200
-2. **강화석** (Material) x3
+1. **크레딧** (Currency) x1000
+2. **노트** (Note) x5
 3. **T1 가방** (Equipment) x1
 4. **전술 EXP** (Exp) x150
 
 #### 검증 테이블 (ValidationResultPanel)
 | 아이템 이름 | 예상 수량 | 실제 수량 | 검증 |
 |------------|----------|----------|------|
-| 크레딧     | 200      | 200      | ✅   |
-| 강화석     | 3        | 3        | ✅   |
+| 크레딧     | 1000      | 1000      | ✅   |
+| 노트     | 5        | 5        | ✅   |
 | T1 가방    | 1        | 1        | ✅   |
 | 전술 EXP   | 150      | 150      | ✅   |
 
@@ -276,14 +308,14 @@ public RewardGrantResult CalculateRewards(string stageName, int totalMoves, Comb
     {
         itemName = "크레딧",
         itemType = RewardItemType.Currency,
-        quantity = 200
+        quantity = 1000
     });
 
     result.GrantedRewards.Add(new RewardItemData
     {
-        itemName = "강화석",
+        itemName = "노트",
         itemType = RewardItemType.Material,
-        quantity = 3
+        quantity = 5
     });
 
     result.GrantedRewards.Add(new RewardItemData
@@ -332,16 +364,14 @@ ValidationResultPanel (중앙 하단) - 예상 vs 실제 비교 테이블
 
 ---
 
----
-
 ## 테스트 결과 해석
 
 ### 성공 시
 ```
-[체크포인트 #1] ✅ 성공 - 전투 위치 도달, 3회 이동
-[체크포인트 #2] ✅ 성공 - 전투 진입, 학생 4명, 적 2명
+[체크포인트 #1] ✅ 성공 - 전투 위치 도달, 5회 이동
+[체크포인트 #2] ✅ 성공 - 전투 진입, 학생 4명, 적 3명
 [체크포인트 #3] ✅ 성공 - EX 스킬 4회 사용
-[체크포인트 #4] ✅ 성공 - 코스트 16, 데미지 1250 기록
+[체크포인트 #4] ✅ 성공 - 코스트 14, 데미지 3185.5 기록
 [체크포인트 #5] ✅ 성공 - 스테이지 클리어, 보상 4개 획득, 인벤토리 추가 및 검증 완료
 
 =====================================
@@ -357,7 +387,7 @@ ValidationResultPanel (중앙 하단) - 예상 vs 실제 비교 테이블
 
 검증 실패 이유: 보상 개수 불일치 (예상: 4, 실제: 0)
   - 보상 미지급: 크레딧 x200
-  - 보상 미지급: 강화석 x3
+  - 보상 미지급: 노트 x3
   - 보상 미지급: T1 가방 x1
   - 보상 미지급: 전술 EXP x150
 ```
