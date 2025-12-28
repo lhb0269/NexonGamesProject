@@ -216,7 +216,7 @@ namespace NexonGame.BlueArchive.UI
             {
                 // 새 슬롯 생성
                 var slotObj = new GameObject($"Slot_{reward.itemType}");
-                slotObj.transform.SetParent(_contentArea, false);
+                slotObj.transform.SetParent(_contentArea.transform, false);
 
                 var slotRectTransform = slotObj.AddComponent<RectTransform>();
                 slotRectTransform.sizeDelta = new Vector2(0, _slotHeight);

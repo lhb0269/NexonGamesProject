@@ -223,11 +223,10 @@ namespace NexonGame.BlueArchive.UI
         {
             return itemType switch
             {
-                RewardItemType.Credit => new Color(1f, 0.84f, 0f), // 골드
-                RewardItemType.AP => new Color(0.3f, 0.8f, 1f),    // 블루
-                RewardItemType.Equipment => new Color(0.8f, 0.3f, 1f), // 퍼플
+                RewardItemType.Currency => new Color(1f, 0.84f, 0f), // 골드
                 RewardItemType.Material => new Color(0.3f, 1f, 0.5f),  // 그린
-                RewardItemType.Experience => new Color(1f, 0.5f, 0.2f), // 오렌지
+                RewardItemType.Equipment => new Color(0.8f, 0.3f, 1f), // 퍼플
+                RewardItemType.Exp => new Color(1f, 0.5f, 0.2f), // 오렌지
                 _ => Color.white
             };
         }
