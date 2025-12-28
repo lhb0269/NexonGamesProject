@@ -308,28 +308,6 @@ ValidationResultPanel (중앙 하단) - 예상 vs 실제 비교 테이블
 
 ---
 
-## 테스트 실행 방법
-
-### Unity Editor에서 실행
-1. Unity Editor 상단 메뉴: `Window` → `General` → `Test Runner`
-2. `PlayMode` 탭 선택
-3. `BlueArchiveIntegrationTests` 확장
-4. 원하는 테스트 우클릭 → `Run Selected` 클릭
-
-### 빌드 실행 파일에서 실행
-1. `NexonGamesProject.exe` 실행
-2. TestBootstrap이 자동으로 TestVisualizationRunner 생성
-3. 테스트 자동 시작 및 진행
-4. TestProgressPanel로 실시간 진행 상황 확인
-
-### 예상 실행 시간
-- **전체 테스트**: 약 15-20초
-- **체크포인트 #1**: 2초
-- **체크포인트 #2**: 2초
-- **체크포인트 #3**: 3초
-- **체크포인트 #4**: 2초
-- **체크포인트 #5**: 8초 (애니메이션 + 검증 시간 포함)
-
 ---
 
 ## 테스트 결과 해석
@@ -359,21 +337,3 @@ ValidationResultPanel (중앙 하단) - 예상 vs 실제 비교 테이블
   - 보상 미지급: T1 가방 x1
   - 보상 미지급: 전술 EXP x150
 ```
-
----
-
-## 문제 해결
-
-### UI가 표시되지 않는 경우
-- **원인**: Assembly Definition 제약으로 빌드에서 제외됨
-- **해결**: `NexonGame.Tests.Automation` 어셈블리 사용 (defineConstraints 없음)
-
-### 검증이 실패하는 경우
-- **원인**: StageData.rewards가 null 또는 비어있음
-- **해결**: CreateTestData()에서 rewards 리스트 초기화 확인
-
-### Input System 오류
-- **원인**: StandaloneInputModule 사용 (Legacy)
-- **해결**: InputSystemUIInputModule 사용 + Unity.InputSystem 참조 추가
-
-자세한 빌드 문제 해결은 [BUILD_TROUBLESHOOTING.md](BUILD_TROUBLESHOOTING.md)를 참고하세요.
