@@ -61,7 +61,7 @@ namespace NexonGame.BlueArchive.UI
         {
             _canvas = gameObject.AddComponent<Canvas>();
             _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            _canvas.sortingOrder = 110; // InventoryPanel보다 높게
+            _canvas.sortingOrder = 220; // InventoryPanel(210)보다 높게
 
             var canvasScaler = gameObject.AddComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
