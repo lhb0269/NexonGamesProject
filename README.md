@@ -81,26 +81,25 @@
 - 이동 횟수가 예상과 다름
 - 최종 위치가 전투 위치가 아님
 ```csharp
-            // ========================================
-            // Assert: 이동 결과 검증
-            // ========================================
-            Debug.Log("  [Assert] 이동 결과 검증");
+// ========================================
+// Assert: 이동 결과 검증
+// ========================================
 
-            // 성공한 이동 횟수 확인
-            Assert.AreEqual(movementPath.Count, successfulMoves,
-                $"모든 이동이 성공해야 함 ({movementPath.Count}회)");
+// 성공한 이동 횟수 확인
+Assert.AreEqual(movementPath.Count, successfulMoves,
+    $"모든 이동이 성공해야 함 ({movementPath.Count}회)");
 
-            // 최종 위치가 전투 위치인지 확인
-            Assert.AreEqual(_testStageData.battlePosition, _stageManager.PlayerPosition,
-                "전투 위치에 도착해야 함");
+// 최종 위치가 전투 위치인지 확인
+Assert.AreEqual(_testStageData.battlePosition, _stageManager.PlayerPosition,
+    "전투 위치에 도착해야 함");
 
-            // 스테이지 상태가 전투 준비 상태인지 확인
-            Assert.AreEqual(StageState.ReadyForBattle, _stageManager.CurrentState,
-                "전투 준비 상태여야 함");
+// 스테이지 상태가 전투 준비 상태인지 확인
+Assert.AreEqual(StageState.ReadyForBattle, _stageManager.CurrentState,
+    "전투 준비 상태여야 함");
 
-            // 총 이동 횟수 확인
-            Assert.AreEqual(movementPath.Count, _stageManager.TotalMovesInStage,
-                "총 이동 횟수가 일치해야 함");
+// 총 이동 횟수 확인
+Assert.AreEqual(movementPath.Count, _stageManager.TotalMovesInStage,
+    "총 이동 횟수가 일치해야 함");
 ```
 ---
 
@@ -140,42 +139,42 @@
 
 ### 전투 진입 및 오브젝트 생성 검증
 ```csharp
-            // ========================================
-            // Assert: 전투 진입 및 오브젝트 생성 검증
-            // ========================================
+// ========================================
+// Assert: 전투 진입 및 오브젝트 생성 검증
+// ========================================
 
-            // 스테이지 상태가 전투 중으로 변경되었는지 확인
-            Assert.AreEqual(StageState.InBattle, _stageManager.CurrentState,
-                "스테이지 상태가 InBattle이어야 함");
+// 스테이지 상태가 전투 중으로 변경되었는지 확인
+Assert.AreEqual(StageState.InBattle, _stageManager.CurrentState,
+    "스테이지 상태가 InBattle이어야 함");
 
-            // 전투 매니저 상태가 진행 중인지 확인
-            Assert.AreEqual(CombatState.InProgress, _combatManager.CurrentState,
-                "전투 매니저 상태가 InProgress여야 함");
+// 전투 매니저 상태가 진행 중인지 확인
+Assert.AreEqual(CombatState.InProgress, _combatManager.CurrentState,
+    "전투 매니저 상태가 InProgress여야 함");
 
-            // 학생 오브젝트 생성 검증
-            var studentObjects = Object.FindObjectsByType<StudentObject>(FindObjectsSortMode.None);
-            Assert.AreEqual(_testStudents.Count, studentObjects.Length,
-                $"학생 오브젝트 {_testStudents.Count}명 생성되어야 함");
+// 학생 오브젝트 생성 검증
+var studentObjects = Object.FindObjectsByType<StudentObject>(FindObjectsSortMode.None);
+Assert.AreEqual(_testStudents.Count, studentObjects.Length,
+    $"학생 오브젝트 {_testStudents.Count}명 생성되어야 함");
 
-            // 적 오브젝트 생성 검증
-            var enemyObjects = Object.FindObjectsByType<EnemyObject>(FindObjectsSortMode.None);
-            Assert.AreEqual(_testEnemies.Count, enemyObjects.Length,
-                $"적 오브젝트 {_testEnemies.Count}명 생성되어야 함");
+// 적 오브젝트 생성 검증
+var enemyObjects = Object.FindObjectsByType<EnemyObject>(FindObjectsSortMode.None);
+Assert.AreEqual(_testEnemies.Count, enemyObjects.Length,
+    $"적 오브젝트 {_testEnemies.Count}명 생성되어야 함");
 
-            // UI 패널 생성 검증
-            var costDisplay = Object.FindFirstObjectByType<CostDisplay>();
-            var combatLogPanel = Object.FindFirstObjectByType<CombatLogPanel>();
-            var combatStatusPanel = Object.FindFirstObjectByType<CombatStatusPanel>();
-            var skillButtonPanel = Object.FindFirstObjectByType<SkillButtonPanel>();
+// UI 패널 생성 검증
+var costDisplay = Object.FindFirstObjectByType<CostDisplay>();
+var combatLogPanel = Object.FindFirstObjectByType<CombatLogPanel>();
+var combatStatusPanel = Object.FindFirstObjectByType<CombatStatusPanel>();
+var skillButtonPanel = Object.FindFirstObjectByType<SkillButtonPanel>();
 
-            Assert.IsNotNull(costDisplay, "CostDisplay가 생성되어야 함");
-            Assert.IsNotNull(combatLogPanel, "CombatLogPanel이 생성되어야 함");
-            Assert.IsNotNull(combatStatusPanel, "CombatStatusPanel이 생성되어야 함");
-            Assert.IsNotNull(skillButtonPanel, "SkillButtonPanel이 생성되어야 함");
+Assert.IsNotNull(costDisplay, "CostDisplay가 생성되어야 함");
+Assert.IsNotNull(combatLogPanel, "CombatLogPanel이 생성되어야 함");
+Assert.IsNotNull(combatStatusPanel, "CombatStatusPanel이 생성되어야 함");
+Assert.IsNotNull(skillButtonPanel, "SkillButtonPanel이 생성되어야 함");
 
-            // 코스트 시스템 초기화 검증
-            Assert.Greater(_combatManager.MaxCost, 0, "최대 코스트가 설정되어야 함");
-            Assert.GreaterOrEqual(_combatManager.CurrentCost, 0, "현재 코스트가 0 이상이어야 함");
+// 코스트 시스템 초기화 검증
+Assert.Greater(_combatManager.MaxCost, 0, "최대 코스트가 설정되어야 함");
+Assert.GreaterOrEqual(_combatManager.CurrentCost, 0, "현재 코스트가 0 이상이어야 함");
 ```
 ---
 
@@ -238,25 +237,25 @@
 
 ### 결과 검증
 ```csharp
-            // ========================================
-            // Assert: 결과 검증
-            // ========================================
-            int finalSkillCount = combatLog.TotalSkillsUsed;
-            int finalDamage = combatLog.TotalDamageDealt;
-            int finalCost = _combatManager.CurrentCost;
+// ========================================
+// Assert: 결과 검증
+// ========================================
+int finalSkillCount = combatLog.TotalSkillsUsed;
+int finalDamage = combatLog.TotalDamageDealt;
+int finalCost = _combatManager.CurrentCost;
 
-            // 스킬이 최소 1회 이상 사용되었는지 검증
-            Assert.Greater(finalSkillCount, initialSkillCount,
-                "스킬이 최소 1회 이상 사용되어야 함");
+// 스킬이 최소 1회 이상 사용되었는지 검증
+Assert.Greater(finalSkillCount, initialSkillCount,
+    "스킬이 최소 1회 이상 사용되어야 함");
 
-            // 데미지가 발생했는지 검증
-            Assert.Greater(finalDamage, initialDamage,
-                "데미지가 발생했어야 함");
+// 데미지가 발생했는지 검증
+Assert.Greater(finalDamage, initialDamage,
+    "데미지가 발생했어야 함");
 
-            // 코스트가 소모되었는지 검증 (코스트 회복 고려)
-            int totalCostSpent = combatLog.TotalCostSpent;
-            Assert.Greater(totalCostSpent, 0,
-                "코스트가 소모되었어야 함");
+// 코스트가 소모되었는지 검증 (코스트 회복 고려)
+int totalCostSpent = combatLog.TotalCostSpent;
+Assert.Greater(totalCostSpent, 0,
+    "코스트가 소모되었어야 함");
 ```
 ---
 
@@ -316,21 +315,21 @@
 
 #### 데미지 기록 검증
 ```csharp
-            // ========================================
-            // Assert: 데미지 기록 검증
-            // ========================================
-            int finalDamage = combatLog.TotalDamageDealt;
-            int finalEnemiesDefeated = combatLog.TotalEnemiesDefeated;
-            int finalSkillsUsed = combatLog.TotalSkillsUsed;
+// ========================================
+// Assert: 데미지 기록 검증
+// ========================================
+int finalDamage = combatLog.TotalDamageDealt;
+int finalEnemiesDefeated = combatLog.TotalEnemiesDefeated;
+int finalSkillsUsed = combatLog.TotalSkillsUsed;
 
-            // 총 데미지가 증가했거나 유지되어야 함
-            Assert.GreaterOrEqual(finalDamage, initialDamage,
-                "총 데미지는 감소하지 않아야 함");
+// 총 데미지가 증가했거나 유지되어야 함
+Assert.GreaterOrEqual(finalDamage, initialDamage,
+    "총 데미지는 감소하지 않아야 함");
 
-            // 학생별 데미지 통계가 존재해야 함
-            var studentDamageStats = combatLog.StudentDamageStats;
-            Assert.Greater(studentDamageStats.Count, 0,
-                "학생별 데미지 통계가 기록되어야 함");
+// 학생별 데미지 통계가 존재해야 함
+var studentDamageStats = combatLog.StudentDamageStats;
+Assert.Greater(studentDamageStats.Count, 0,
+    "학생별 데미지 통계가 기록되어야 함");
 ```
 ---
 
