@@ -1,5 +1,29 @@
 # 블루 아카이브 테스트 자동화 검증 과정
 
+## Unity Test Framework의 제약과 해결 방법
+
+### Unity Test Framework의 제약
+- **Unity Test Runner는 에디터 환경에서만 실행됨**
+  - 빌드된 실행 파일(.exe)에는 테스트 코드가 포함되지 않음
+  - `[UnityTest]` 어트리뷰트가 있는 코드는 빌드에서 제외됨
+
+### 과제 요구사항 충족
+- **"자동화 실행 파일"** = 빌드된 .exe 파일
+- 테스트 검증 과정을 **"시각적으로 보여주는"** 실행 파일 필요
+
+### 해결 방법
+1. **TestVisualizationRunner.cs 생성** (빌드에 포함됨)
+   - 테스트 로직을 일반 MonoBehaviour로 재구현
+   - `[UnityTest]` 어트리뷰트 없이 작성하여 빌드에 포함
+2. **체크포인트 진행 상황을 UI로 시각화**
+   - TestProgressPanel로 실시간 진행 상황 표시
+   - 각 체크포인트별 통과/실패 상태 시각화
+3. **두 가지 테스트 스크립트 병행 사용**
+   - `BlueArchiveIntegrationTests.cs`: 개발 중 NUnit Assert 검증용 (에디터 전용)
+   - `TestVisualizationRunner.cs`: 실행 파일 데모용 (빌드 포함)
+
+---
+
 ## 목차
 1. [전체 테스트 흐름](#전체-테스트-흐름)
 2. [체크포인트별 검증 과정](#체크포인트별-검증-과정)
