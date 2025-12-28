@@ -754,28 +754,6 @@ namespace NexonGame.Tests.PlayMode
             _testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.Completed);
             _testProgressPanel.UpdateMessage("보상 획득 완료!");
             yield return new WaitForSeconds(1f);
-
-            // 정리: 전투 관련 오브젝트 제거
-            Object.Destroy(rewardPanelObj);
-
-            var studentObjects = Object.FindObjectsByType<StudentObject>(FindObjectsSortMode.None);
-            var enemyObjects = Object.FindObjectsByType<EnemyObject>(FindObjectsSortMode.None);
-            var costDisplay = Object.FindFirstObjectByType<CostDisplay>();
-            var combatLogPanel = Object.FindFirstObjectByType<CombatLogPanel>();
-            var combatStatusPanel = Object.FindFirstObjectByType<CombatStatusPanel>();
-
-            foreach (var student in studentObjects)
-                Object.Destroy(student.gameObject);
-            foreach (var enemy in enemyObjects)
-                Object.Destroy(enemy.gameObject);
-            if (costDisplay != null)
-                Object.Destroy(costDisplay.gameObject);
-            if (combatLogPanel != null)
-                Object.Destroy(combatLogPanel.gameObject);
-            if (combatStatusPanel != null)
-                Object.Destroy(combatStatusPanel.gameObject);
-
-            Debug.Log($"  🧹 전투 오브젝트 정리 완료 (학생 {studentObjects.Length}명, 적 {enemyObjects.Length}명, UI 패널 3개)");
             yield return null;
         }
 
