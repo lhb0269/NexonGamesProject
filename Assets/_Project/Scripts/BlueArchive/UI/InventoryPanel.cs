@@ -165,7 +165,7 @@ namespace NexonGame.BlueArchive.UI
 
             // Content 영역
             var contentObj = new GameObject("Content");
-            contentObj.transform.SetParent(scrollObj, false);
+            contentObj.transform.SetParent(scrollObj.transform, false);
 
             _contentArea = contentObj.AddComponent<RectTransform>();
             _contentArea.anchorMin = new Vector2(0, 1);
