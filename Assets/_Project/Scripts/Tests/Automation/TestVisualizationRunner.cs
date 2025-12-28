@@ -147,8 +147,8 @@ namespace NexonGame.Tests.Automation
             // 보상 데이터 생성 (RewardValidator 검증을 위해 필요)
             _testStageData.rewards = new List<RewardItemData>
             {
-                CreateRewardItem("크레딧", RewardItemType.Currency, 200),
-                CreateRewardItem("강화석", RewardItemType.Material, 3),
+                CreateRewardItem("크레딧", RewardItemType.Currency, 1000),
+                CreateRewardItem("노트", RewardItemType.Material, 5),
                 CreateRewardItem("T1 가방", RewardItemType.Equipment, 1),
                 CreateRewardItem("전술 EXP", RewardItemType.Exp, 150)
             };
