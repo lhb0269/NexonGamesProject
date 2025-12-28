@@ -14,7 +14,17 @@
       "Bash(dir:*)",
       "Bash(findstr:*)",
       "Bash(if exist build rmdir /s /q build)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(move ARCHITECTURE_ANALYSIS.md Docs )",
+      "Bash(move BUILD_TROUBLESHOOTING.md Docs )",
+      "Bash(move CHANGELOG.md Docs )",
+      "Bash(move CLAUDE.md Docs )",
+      "Bash(move CODE_GUIDE.md Docs )",
+      "Bash(move CONTRIBUTING.md Docs )",
+      "Bash(move PLAYMODE_IMPLEMENTATION_PLAN.md Docs )",
+      "Bash(move PROJECT_PLAN.md Docs )",
+      "Bash(move PROJECT_README.md Docs )",
+      "Bash(move TESTING_GUIDE.md Docs)"
     ],
     "deny": [],
     "ask": []
