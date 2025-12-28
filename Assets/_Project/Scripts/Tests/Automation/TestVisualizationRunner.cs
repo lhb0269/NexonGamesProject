@@ -144,6 +144,15 @@ namespace NexonGame.Tests.Automation
                 new Vector2Int(2, 1)
             };
 
+            // 보상 데이터 생성 (RewardValidator 검증을 위해 필요)
+            _testStageData.rewards = new List<RewardItemData>
+            {
+                CreateRewardItem("크레딧", RewardItemType.Currency, 200),
+                CreateRewardItem("강화석", RewardItemType.Material, 3),
+                CreateRewardItem("T1 가방", RewardItemType.Equipment, 1),
+                CreateRewardItem("전술 EXP", RewardItemType.Exp, 150)
+            };
+
             // 학생 데이터 생성
             _testStudents = CreateTestStudents();
 
@@ -153,6 +162,19 @@ namespace NexonGame.Tests.Automation
             Debug.Log($"[TestData] 스테이지: {_testStageData.stageName}");
             Debug.Log($"[TestData] 학생: {_testStudents.Count}명");
             Debug.Log($"[TestData] 적: {_testEnemies.Count}명");
+            Debug.Log($"[TestData] 보상: {_testStageData.rewards.Count}개");
+        }
+
+        /// <summary>
+        /// 보상 아이템 생성 헬퍼
+        /// </summary>
+        private RewardItemData CreateRewardItem(string name, RewardItemType type, int quantity)
+        {
+            var reward = ScriptableObject.CreateInstance<RewardItemData>();
+            reward.itemName = name;
+            reward.itemType = type;
+            reward.quantity = quantity;
+            return reward;
         }
 
         /// <summary>
