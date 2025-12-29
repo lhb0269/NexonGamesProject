@@ -404,6 +404,36 @@ ValidationResultPanel (중앙 하단) - 예상 vs 실제 비교 테이블
 - 인벤토리 데이터가 없음
 - 예상 보상과 실제 인벤토리 수량이 불일치
 
+### 검증 패널 생성 확인
+```csharp
+// Assert: 검증 패널 생성 확인
+Assert.IsNotNull(validationPanel, "ValidationResultPanel이 생성되어야 함");
+Debug.Log("  ✅ ValidationResultPanel 표시 완료");
+
+yield return new WaitForSeconds(3f);
+
+// ========================================
+// Assert: 최종 검증 (2단계)
+// ========================================
+
+// 인벤토리 데이터 존재 확인
+Assert.Greater(inventoryData.Count, 0, "인벤토리에 아이템이 있어야 함");
+
+// 모든 보상이 인벤토리에 정확히 추가되었는지 확인
+foreach (var reward in rewardResult.GrantedRewards)
+{
+Assert.IsTrue(inventoryData.ContainsKey(reward.itemType),
+    $"인벤토리에 {reward.itemType} 타입이 있어야 함");
+
+int inventoryQuantity = inventoryData[reward.itemType];
+Assert.AreEqual(reward.quantity, inventoryQuantity,
+    $"{reward.itemName}: 예상 {reward.quantity}, 실제 {inventoryQuantity}");
+}
+
+
+_testProgressPanel.UpdateCheckpoint(5, CheckpointStatus.Completed);
+_testProgressPanel.UpdateMessage("보상 획득 및 검증 완료!");
+```
 ---
 
 ## 테스트 결과 해석
